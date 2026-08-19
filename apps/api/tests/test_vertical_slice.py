@@ -67,6 +67,11 @@ async def _ingest_manual(pdf_bytes: bytes, device_id: str, title: str, version: 
         pdf_path = Path(tmp.name)
     await run_ingestion(job_id, ver_id, pdf_path)
 
+    # 补写对象存储（等价 HTTP 上传流程中的 storage.put；否则 /files 路由 404）
+    from h2copilot.ingestion.storage import LocalFSStorage
+
+    await LocalFSStorage().put("test.pdf", pdf_bytes)
+
     async with session_scope() as session:
         job_row = await session.get(IngestionJob, uuid.UUID(job_id))
         assert job_row is not None

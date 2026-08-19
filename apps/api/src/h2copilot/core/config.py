@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     # 0.95 适配 FakeEmbedding（无共享词 ≈ 正交，距离 ≈ 1）；真实 embedding 需重标定。
     retrieval_dense_max_distance: float = 0.95
 
+    # Phase 6 横切边界（技术规范 §74/§106/§108）
+    query_timeout_seconds: float = 8.0  # 全链路预算上限（P95 目标同值）
+    query_rpm: int = 60  # 进程内限流（每分钟查询数）；生产换 Redis 限流（§77）
+
 
 @lru_cache
 def get_settings() -> Settings:

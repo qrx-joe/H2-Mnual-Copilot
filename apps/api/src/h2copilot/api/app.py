@@ -8,11 +8,11 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from h2copilot.api.routes import devices, documents, health, query
+from h2copilot.api.routes import devices, documents, feedback, health, query, sources
 from h2copilot.core.config import get_settings
 from h2copilot.observability.middleware import RequestContextMiddleware
 
@@ -87,6 +87,23 @@ def create_app() -> FastAPI:
     app.include_router(query.router)
     app.include_router(documents.router)
     app.include_router(devices.router)
+    app.include_router(sources.router)
+    app.include_router(feedback.router)
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request: Request, exc: HTTPException) -> JSONResponse:
+        """业务 HTTP 错误（401/429/404…）转统一错误结构（契约 §5）。"""
+        request_id = getattr(request.state, "request_id", None)
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "error": {
+                    "code": str(exc.detail),
+                    "message": str(exc.detail),
+                    "request_id": request_id,
+                }
+            },
+        )
 
     @app.exception_handler(Exception)
     async def unhandled_error(request: Request, exc: Exception) -> JSONResponse:

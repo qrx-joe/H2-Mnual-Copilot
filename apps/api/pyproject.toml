@@ -56,6 +56,7 @@ warn_redundant_casts = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = ["integration: 需要真实 Postgres（h2copilot_test）的集成测试"]
 
 [[tool.mypy.overrides]]
 module = "pymupdf4llm"

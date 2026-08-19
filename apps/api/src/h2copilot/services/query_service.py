@@ -4,6 +4,8 @@
 返回的 Chunk 携带完整 provenance，引用永远来自真实检索结果（A3）。
 """
 
+import json
+import logging
 import time
 import uuid
 from dataclasses import dataclass
@@ -17,6 +19,8 @@ from h2copilot.llm.providers import (
 )
 from h2copilot.retrieval.search import classify_intent, reciprocal_rank_fusion, search_chunks
 
+logger = logging.getLogger("h2copilot.query")
+
 
 @dataclass
 class QueryResult:
@@ -27,6 +31,7 @@ class QueryResult:
     answer: GeneratedAnswer
     citations: list[dict]
     chunk_ids: list[str]
+    model_alias: str = ""
 
 
 class QueryService:
@@ -73,6 +78,25 @@ class QueryService:
             for c in generated.used_chunks
         ]
 
+        # AI 结构化日志（技术规范 §69）：只记 ID/指标/元数据，不记查询正文与上下文（§73）
+        logger.info(
+            json.dumps(
+                {
+                    "request_id": request_id,
+                    "stage": "query",
+                    "intent": intent.value,
+                    "retrieval_ms": retrieval_ms,
+                    "chunks": len(evidence),
+                    "evidence_status": generated.evidence_status.value,
+                    "abstain": generated.abstain,
+                    "model_alias": self._generator.name,
+                    "embedder": self._embedder.name,
+                    "reranker": self._reranker.name,
+                },
+                ensure_ascii=False,
+            )
+        )
+
         return QueryResult(
             request_id=request_id,
             intent=intent.value,
@@ -81,4 +105,5 @@ class QueryService:
             answer=generated,
             citations=citations,
             chunk_ids=[c.chunk_id for c in evidence],
+            model_alias=self._generator.name,
         )

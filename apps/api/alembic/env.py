@@ -24,9 +24,10 @@ if _url:
     config.set_main_option("sqlalchemy.url", _url)
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
+# disable_existing_loggers 必须为 False：默认 True 会禁用迁移运行前已创建的应用
+# logger（如 h2copilot.query），导致测试与进程内调用 alembic 时应用日志全部丢失。
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
