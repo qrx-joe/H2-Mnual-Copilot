@@ -37,8 +37,9 @@ class Settings(BaseSettings):
     rerank_candidates: int = 30
     # 向量路相似度阈值（余弦距离上限）：无阈值时 ORDER BY 距离必然返回 k 条"最近邻"，
     # 无关查询会被当作有证据——拒答路径（FR-006）依赖此过滤。
-    # 0.95 适配 FakeEmbedding（无共享词 ≈ 正交，距离 ≈ 1）；真实 embedding 需重标定。
-    retrieval_dense_max_distance: float = 0.95
+    # 0.78 为 FakeEmbedding（含停用词过滤）标定值：单代码查询≈0.74 通过、
+    # 单个公共词重叠≈0.82 被拒（evals/report.json 驱动）；真实 embedding 必须重标定。
+    retrieval_dense_max_distance: float = 0.78
 
     # Phase 6 横切边界（技术规范 §74/§106/§108）
     query_timeout_seconds: float = 8.0  # 全链路预算上限（P95 目标同值）

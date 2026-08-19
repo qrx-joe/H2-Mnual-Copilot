@@ -1,0 +1,510 @@
+{
+  "summary": {
+    "total": 30,
+    "runnable": 21,
+    "blocked_real_embedding": 9,
+    "errors": 0,
+    "recall_at_citation": 1.0,
+    "no_answer_accuracy": 1.0,
+    "model_layer": "Fake providers（真实模型指标待 Q-010）"
+  },
+  "results": [
+    {
+      "id": "exact-1",
+      "category": "exact",
+      "question": "E104",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Maintenance Manual",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Maintenance Manual",
+          1
+        ],
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "exact-2",
+      "category": "exact",
+      "question": "E105",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Maintenance Manual",
+      "expected_pages": [
+        2
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Maintenance Manual",
+          2
+        ],
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "exact-3",
+      "category": "exact",
+      "question": "E106",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Maintenance Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Maintenance Manual",
+          3
+        ],
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "exact-4",
+      "category": "exact",
+      "question": "E107",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Error Code Reference",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "exact-5",
+      "category": "exact",
+      "question": "E108",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Error Code Reference",
+      "expected_pages": [
+        2
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Error Code Reference",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "exact-6",
+      "category": "exact",
+      "question": "E110",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Error Code Reference",
+      "expected_pages": [
+        2
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Error Code Reference",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "exact-7",
+      "category": "exact",
+      "question": "E104",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Error Code Reference",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Maintenance Manual",
+          1
+        ],
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "exact-8",
+      "category": "exact",
+      "question": "E106",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Error Code Reference",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Maintenance Manual",
+          3
+        ],
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "easy-1",
+      "category": "easy",
+      "question": "What language is the manual written in?",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Operation Manual",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "easy-2",
+      "category": "easy",
+      "question": "feed water pre-start requirement",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        2
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Operation Manual",
+          2
+        ],
+        [
+          "HX-100 Maintenance Manual",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "easy-3",
+      "category": "easy",
+      "question": "Normal operating pressure",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Operation Manual",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "easy-4",
+      "category": "easy",
+      "question": "Pre-start pressure",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Operation Manual",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "easy-5",
+      "category": "easy",
+      "question": "Coolant temperature range",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Operation Manual",
+          3
+        ],
+        [
+          "HX-100 Maintenance Manual",
+          1
+        ]
+      ]
+    },
+    {
+      "id": "sem-1",
+      "category": "semantic_zh",
+      "question": "冷却系统温度异常应该怎么处理？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Maintenance Manual",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "sem-2",
+      "category": "semantic_zh",
+      "question": "启动之前需要完成哪些检查？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        2
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "sem-3",
+      "category": "semantic_zh",
+      "question": "正常工作压力是多少？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "sem-4",
+      "category": "semantic_zh",
+      "question": "检测到氢气泄漏应该怎么办？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Maintenance Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "sem-5",
+      "category": "semantic_zh",
+      "question": "电气检修前要注意什么？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Safety Guide",
+      "expected_pages": [
+        2
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "ver-1",
+      "category": "version",
+      "question": "Normal operating pressure",
+      "device_id": "hx100",
+      "version": "2.1",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Operation Manual",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "ver-2",
+      "category": "version",
+      "question": "Normal operating pressure",
+      "device_id": "hx100",
+      "version": "1.9",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "noans-1",
+      "category": "no_answer",
+      "question": "HX-100 purchase price",
+      "device_id": "hx100",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "noans-2",
+      "category": "no_answer",
+      "question": "HX-100 competitor specification",
+      "device_id": "hx100",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "noans-3",
+      "category": "no_answer",
+      "question": "What is the weather today",
+      "device_id": "hx100",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "noans-4",
+      "category": "no_answer",
+      "question": "HX-100 kitchen cleaning procedure",
+      "device_id": "hx100",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "noans-5",
+      "category": "no_answer",
+      "question": "E999",
+      "device_id": "hx100",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "noans-6",
+      "category": "no_answer",
+      "question": "HX-80 normal operating pressure",
+      "device_id": "hx80",
+      "expected_document": null,
+      "expected_pages": [],
+      "answerable": false,
+      "status": "pass",
+      "abstain": true,
+      "citations": []
+    },
+    {
+      "id": "cross-1",
+      "category": "cross_language",
+      "question": "如何检查氢气纯度？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "cross-2",
+      "category": "cross_language",
+      "question": "启动前要确认哪些 safety interlock？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Safety Guide",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "cross-3",
+      "category": "cross_language",
+      "question": "E104 是什么？",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Maintenance Manual",
+      "expected_pages": [
+        1
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    },
+    {
+      "id": "cross-4",
+      "category": "cross_language",
+      "question": "正常工作压力是多少",
+      "device_id": "hx100",
+      "expected_document": "HX-100 Operation Manual",
+      "expected_pages": [
+        3
+      ],
+      "answerable": true,
+      "requires_real_embedding": true,
+      "status": "blocked_real_embedding"
+    }
+  ]
+}
