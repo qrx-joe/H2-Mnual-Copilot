@@ -10,12 +10,7 @@ import uuid
 import httpx
 import pymupdf
 import pytest
-from httpx import ASGITransport
-from sqlalchemy import text
 
-from h2copilot.api.app import app
-from h2copilot.core.config import get_settings
-from h2copilot.core.db import dispose_engine, get_engine
 from h2copilot.domain.enums import DocumentType, TrustLevel
 from h2copilot.domain.models import Device, Document, DocumentVersion, IngestionJob
 from h2copilot.ingestion.pipeline import run_ingestion, sha256_bytes
@@ -35,43 +30,6 @@ def _make_manual(path, pages: list[list[str]]) -> bytes:
     doc.save(str(path))
     doc.close()
     return path.read_bytes()
-
-
-@pytest.fixture(autouse=True)
-def _test_database():
-    """切到 h2copilot_test 库并跑迁移；测试间清空业务表保证隔离。"""
-    import os
-
-    base = os.environ.get("DATABASE_URL", "postgresql+asyncpg://h2copilot:h2copilot@localhost:5432/h2copilot")
-    os.environ["DATABASE_URL"] = base.rsplit("/", 1)[0] + "/h2copilot_test"
-    get_settings.cache_clear()
-
-    from alembic import command
-    from alembic.config import Config
-
-    cfg = Config("alembic.ini")
-    command.upgrade(cfg, "head")
-
-    yield
-
-    get_settings.cache_clear()
-    import asyncio
-
-    asyncio.get_event_loop_policy()
-    # 事件循环由 pytest-asyncio 管理；这里只清缓存，引擎由每个测试自行关闭
-    os.environ["DATABASE_URL"] = base
-    get_settings.cache_clear()
-
-
-async def _truncate() -> None:
-    engine = get_engine()
-    async with engine.begin() as conn:
-        await conn.execute(
-            text(
-                "TRUNCATE citations, feedback, messages, conversations, chunks, "
-                "ingestion_jobs, document_versions, documents, devices CASCADE"
-            )
-        )
 
 
 async def _ingest_manual(pdf_bytes: bytes, device_id: str, title: str, version: str) -> None:
@@ -113,15 +71,6 @@ async def _ingest_manual(pdf_bytes: bytes, device_id: str, title: str, version: 
         job_row = await session.get(IngestionJob, uuid.UUID(job_id))
         assert job_row is not None
         assert job_row.status.value == "READY", f"ingestion 失败: {job_row.error}"
-
-
-@pytest.fixture
-async def client():
-    await _truncate()
-    transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-    await dispose_engine()
 
 
 MANUAL_PAGES = [

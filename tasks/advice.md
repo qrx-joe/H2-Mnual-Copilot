@@ -284,3 +284,30 @@
 
 - Q-012：用户浏览器查看后确认视觉还原度（Phase 4 验收门条件）。
 - 维持 Q-010/Q-011（Phase 5 硬前置）。
+
+## 2026-08-19 · 交互 012 Phase 5 垂直切片（ZCode 出具）
+
+### 交付物（提交 d0a2d3f / 2337aae 及后续）
+
+- 后端：SQLAlchemy 模型（9 实体）+ Alembic 迁移（真实 Postgres 10 表）；ingestion 管线（PyMuPDF4LLM page_chunks→结构化 chunk→FakeEmbedding→状态机）；hybrid 检索（intent 路由+tsvector/pgvector 双路+RRF+距离阈值）；抽取式生成替身（拒答/版本冲突/安全提示）；真实 SSE Query API + documents/devices/jobs 路由 + CORS。
+- 前端：SSE 流驱动管线与回答卡（parseSSE seam 接线）、真实设备/文档列表、真实上传表单（轮询 job）。
+- 验证：`docs/phase5-vertical-slice.md`（证据分层：真实链路 vs Fake 模型）；合成 HX-100 手册脚本（PRD §46 自建样例授权）。
+- 检查链：API ruff/mypy/pytest 14 全绿；web lint/vitest/build 全绿。
+
+### 证据分层结论
+
+- 【真实】：迁移、上传→READY（<4s）、E104 问答（引用 v2.1/p1/摘录，检索 15ms）、拒答、设备隔离、浏览器 UI 全链路、14 自动化测试。
+- 【Fake】：embedding/rerank/生成三个替身——答案质量不代表真实模型；行为逻辑（拒答/引用/冲突/安全）是产品逻辑已落地。
+- 【待验证】：跨语言（FR-101 P0）必须等真实 embedding（Q-010）；真实手册解析与 MinerU 触发条件等 Q-011。
+
+### 本阶段发现并修复
+
+1. dense 无阈值 → 拒答被击穿（FR-006 失效）：加 `retrieval_dense_max_distance=0.95`（配置化）。
+2. 集成测试污染开发库：env 覆盖时机不可靠 → conftest 收集期切换 + 残留清理 + 复测确认隔离。
+3. Alembic 部分唯一索引 WHERE 生成错误；`session_scope` 缺 `@asynccontextmanager`（mypy 抓出，避免运行时崩溃）。
+
+### 风险与移交
+
+- 距离阈值 0.95 是 FakeEmbedding 标定值，换真实模型必须重标定（已写入配置注释）。
+- 版本冲突 E2E 需双版本数据集（Phase 6）；Source Viewer 真实 PDF（T-020）与反馈落库（T-022）在 Phase 6。
+- Git Bash GBK 控制台发中文 JSON 会报 body parse 错误（用 UTF-8 文件体规避，API 本身正常）。

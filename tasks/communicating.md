@@ -435,3 +435,44 @@
 
 - Q-012：视觉还原度确认（打开 localhost:3000）。
 - Q-010 / Q-011：维持（Phase 5 硬前置）。
+
+## 2026-08-19 · 交互 012
+
+> 时间：2026-08-19 23:20—23:55 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 执行 Phase 5（第一条端到端垂直切片）。
+
+### AI 检查与行动
+
+- T-013：SQLAlchemy 9 实体 + Alembic 初始迁移，真实 Postgres 建 10 表（含 file_hash 唯一、is_current 部分唯一索引、pgvector/tsvector）。
+- T-014：ingestion 管线（page_chunks 页码溯源/结构化分块/FakeEmbedding/状态机/失败落库）+ documents/devices/ingestion-jobs 路由（Admin 口令、PDF 校验、hash 去重）。
+- T-015/T-016：hybrid 检索（intent regex 路由、双路召回、RRF、距离阈值）+ 抽取式生成替身（拒答/版本冲突/安全提示/引用仅来自真实检索）。
+- T-017：真实 SSE Query API（契约事件序列、error 事件）替换 Phase 3 桩；CORS 放行 localhost:3000。
+- 前端（2337aae）：SSE 流驱动管线与回答卡、真实设备/文档列表、真实上传表单与 job 轮询。
+- E2E 验证（证据分层记录于 `docs/phase5-vertical-slice.md`）：合成 HX-100 手册上传→READY<4s；E104 问答引用 v2.1/p1；拒答与设备隔离路径；浏览器 UI 全链路（Grounded answer + p.1 引用徽章 + 证据部分覆盖）。
+- 修复三个真实缺陷：dense 无阈值击穿拒答、集成测试污染开发库（conftest 收集期切库）、Alembic/上下文管理器两处实现错误。
+- 检查链全绿：API ruff/mypy/pytest(14，含真实 Postgres 集成)；web lint/vitest(5)/build。
+
+### 本智能体写入内容
+
+| 文件 | 写入内容 |
+| --- | --- |
+| `apps/api/src/h2copilot/**`（15 新文件） | domain 模型/枚举、db、providers/generator、parser/pipeline/storage、search、query_service、routes(query/documents/devices) |
+| `apps/api/alembic/**`、`pyproject.toml`、`.env.example`、`tests/**`（conftest 重写 + 2 测试文件） | 迁移、依赖、测试库隔离、单元+集成测试 |
+| `apps/web/src/lib/api.ts`、`page.tsx`、`knowledge/page.tsx`、`composer.tsx`、`upload-modal.tsx` | 前端真实接线 |
+| `scripts/make_sample_manual.py`、`docs/phase5-vertical-slice.md` | 合成样例手册生成、验证报告 |
+| `tasks/todo.md` | T-008/T-017 完成；T-013—T-016 进行中（真实模型待 Q-010） |
+| `tasks/advice.md`、`tasks/next-todo.md`、`tasks/communicating.md` | 交互 012 与 Phase 6 计划 |
+
+### 本轮决定
+
+- T-008 验收门通过（fake 模型级闭环 + 真实数据层/接口层/浏览器证据，分层汇报）。
+- 距离阈值 0.95 为 Fake 标定值，真实模型接入后必须重标定（配置注释已写明）。
+- localhost:3000 + :8000 服务保持运行，用户可直接体验真实链路（含 Q-012 视觉确认）。
+
+### 待确认
+
+- Q-010：百炼 API Key；Q-011：演示 PDF 与 golden 素材；Q-012：视觉确认（现在可看真实链路）。

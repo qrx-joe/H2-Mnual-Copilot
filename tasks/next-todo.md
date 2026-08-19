@@ -4,16 +4,20 @@
 
 ## 当前
 
-1. **Phase 4 收尾（等待用户）**：Q-012 —— 打开 `http://localhost:3000` 查看视觉还原度并确认或提出修改（重点：四态徽章观感、D-1～D-5 有意差异清单见 `docs/phase4-visual-baseline.md`）。
+1. **执行 Phase 6：质量、异常、安全与可观测性**
+   - 输入：Phase 5 切片（`docs/phase5-vertical-slice.md` §4 边界清单）+ 追踪矩阵。
+   - 动作：T-009 状态补齐（超时/不可用）；T-020 Source Viewer 真实 PDF（PDF.js 页定位）；T-022 反馈落库 API；T-023 golden dataset（合成样例集先建 30 条）；T-024 安全测试集；性能与日志核对。
+   - 验证：核心需求逐条有测试或人工验收步骤；阻塞缺陷有状态。
+   - 说明：真实模型相关评测仍等 Q-010/Q-011。
 
-2. **执行 Phase 5：第一条端到端垂直切片（Q-012 不阻塞开工，阻塞验收）**
-   - 输入：契约（contracts.md）、ADR、工程基线、前端骨架（本轮）、API SSE 桩。
-   - 动作：T-013 数据模型与迁移 → T-014 接入管线 → T-015 hybrid 检索 → T-016 生成与验证 → T-017 真实 Query API+SSE → 前端换真实数据；先建集成测试再实现（fake provider）。
-   - 硬前置：Q-010（百炼 API Key）、Q-011（演示 PDF）——没有它们只能做到 fake provider 级闭环，真实集成证据必须等凭据。
+2. **用户侧输入（阻塞真实模型证据）**
+   - Q-010：百炼 API Key（.env.local 注入）→ 接入真实 embedding/rerank/LLM 并重标定距离阈值。
+   - Q-011：HX-100 演示 PDF + golden 问题素材 → 真实解析质量与 MinerU 触发条件。
+   - Q-012：Phase 4 视觉确认（localhost:3000 现已跑真实链路，可一并体验）。
 
 ## 暂不执行
 
-- Evaluation / Settings 页面实现（已裁决不进 MVP）。
+- Evaluation / Settings 页面（已裁决不进 MVP）。
 - Evidence 数值评分环（已裁决改为状态徽章）。
 - 真实付费 API 调用（等 Q-010 凭据与授权）。
 - 未经确认向外部任务系统同步或发布内容。
