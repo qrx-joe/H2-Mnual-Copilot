@@ -26,5 +26,5 @@
 {"id": "noans-6", "category": "no_answer", "question": "HX-80 normal operating pressure", "device_id": "hx80", "expected_document": null, "expected_pages": [], "answerable": false}
 {"id": "cross-1", "category": "cross_language", "question": "如何检查氢气纯度？", "device_id": "hx100", "expected_document": "HX-100 Operation Manual", "expected_pages": [1], "answerable": true, "requires_real_embedding": true}
 {"id": "cross-2", "category": "cross_language", "question": "启动前要确认哪些 safety interlock？", "device_id": "hx100", "expected_document": "HX-100 Safety Guide", "expected_pages": [1], "answerable": true, "requires_real_embedding": true}
-{"id": "cross-3", "category": "cross_language", "question": "E104 是什么？", "device_id": "hx100", "expected_document": "HX-100 Maintenance Manual", "expected_pages": [1], "answerable": true, "requires_real_embedding": true}
+{"id": "cross-3", "category": "cross_language", "question": "E104 是什么？", "device_id": "hx100", "expected_document": "HX-100 Maintenance Manual", "expected_pages": [1], "answerable": true}
 {"id": "cross-4", "category": "cross_language", "question": "正常工作压力是多少", "device_id": "hx100", "expected_document": "HX-100 Operation Manual", "expected_pages": [3], "answerable": true, "requires_real_embedding": true}

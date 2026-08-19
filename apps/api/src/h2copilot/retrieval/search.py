@@ -16,11 +16,39 @@ from h2copilot.llm.providers import ChunkRef
 
 RRF_K = 60
 ERROR_CODE_RE = re.compile(r"^[A-Z]{1,4}[-_]?\d{2,6}$")
+# 混合文本中的代码提取（技术规范 §38：regex 命中即走精确词法，如"E104 是什么？"）
+ERROR_CODE_SEARCH_RE = re.compile(r"\b([A-Z]{1,4}[-_]?\d{2,6})\b")
+LATIN_WORD_RE = re.compile(r"[A-Za-z]{2,}")
+
+
+def error_code_search_term(query: str) -> str | None:
+    """代码路由判定：返回应做精确词法检索的代码词；不适用则 None。
+
+    适用条件（§38）：查询是纯代码/型号，或"代码 + 非拉丁文本"（如中文问句
+    夹 E104）。若剩余文本含英文实词（如 "HX-100 purchase price"），说明
+    用户在用完整词法问句，退化成裸代码会让型号词命中一切——必须返回 None，
+    让完整查询走正常 AND 词法（不命中即拒答）。
+    """
+    q = query.strip()
+    if ERROR_CODE_RE.match(q.upper()):
+        return q.upper()
+    m = ERROR_CODE_SEARCH_RE.search(q.upper())
+    if not m:
+        return None
+    remainder = q.upper().replace(m.group(1), " ")
+    if LATIN_WORD_RE.search(remainder):
+        return None
+    return m.group(1)
+
+
+def extract_error_code(query: str) -> str | None:
+    """兼容旧名：等价 error_code_search_term。"""
+    return error_code_search_term(query)
 
 
 def classify_intent(query: str) -> QueryIntent:
     q = query.strip()
-    if ERROR_CODE_RE.match(q.upper()):
+    if error_code_search_term(q):
         return QueryIntent.ERROR_CODE
     lowered = q.lower()
     if any(k in lowered for k in ("压力", "参数", "温度设定", "pressure", "parameter")):

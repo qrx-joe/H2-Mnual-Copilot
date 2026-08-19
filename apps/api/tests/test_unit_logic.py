@@ -27,6 +27,18 @@ def test_intent_error_code() -> None:
     assert classify_intent("E104") is QueryIntent.ERROR_CODE
     assert classify_intent("e104 ") is QueryIntent.ERROR_CODE  # 规范化后命中
     assert classify_intent("HX-100") is QueryIntent.ERROR_CODE  # 型号走同一词法路径
+    # 混合中文问句中的代码也走错误代码路由（§38：词法查询词=代码本身）
+    assert classify_intent("E104 是什么？应该先检查什么？") is QueryIntent.ERROR_CODE
+
+
+def test_extract_error_code() -> None:
+    from h2copilot.retrieval.search import extract_error_code
+
+    assert extract_error_code("E104 是什么？") == "E104"
+    assert extract_error_code("hx-100 启动压力") == "HX-100"
+    assert extract_error_code("冷却系统异常") is None
+    # 剩余文本含英文实词 → 不走代码路由（裸型号会命中一切，见 §38 注释）
+    assert extract_error_code("HX-100 purchase price") is None
 
 
 def test_intent_natural_language() -> None:

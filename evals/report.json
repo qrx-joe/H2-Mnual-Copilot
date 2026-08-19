@@ -1,8 +1,8 @@
 {
   "summary": {
     "total": 30,
-    "runnable": 21,
-    "blocked_real_embedding": 9,
+    "runnable": 22,
+    "blocked_real_embedding": 8,
     "errors": 0,
     "recall_at_citation": 1.0,
     "no_answer_accuracy": 1.0,
@@ -490,8 +490,18 @@
         1
       ],
       "answerable": true,
-      "requires_real_embedding": true,
-      "status": "blocked_real_embedding"
+      "status": "pass",
+      "abstain": false,
+      "citations": [
+        [
+          "HX-100 Maintenance Manual",
+          1
+        ],
+        [
+          "HX-100 Error Code Reference",
+          1
+        ]
+      ]
     },
     {
       "id": "cross-4",

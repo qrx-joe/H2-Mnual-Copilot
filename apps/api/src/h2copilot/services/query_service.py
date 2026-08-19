@@ -17,7 +17,12 @@ from h2copilot.llm.providers import (
     get_embedding_provider,
     get_rerank_provider,
 )
-from h2copilot.retrieval.search import classify_intent, reciprocal_rank_fusion, search_chunks
+from h2copilot.retrieval.search import (
+    classify_intent,
+    extract_error_code,
+    reciprocal_rank_fusion,
+    search_chunks,
+)
 
 logger = logging.getLogger("h2copilot.query")
 
@@ -47,11 +52,12 @@ class QueryService:
 
         started = time.perf_counter()
         query_vec = await self._embedder.embed_query(query)
-        # ERROR_CODE 意图词法路加权：双路都查，但词法 top_k 提高（§38 exact lexical 优先）
+        # §38：查询中含错误代码/型号 → 词法检索词只用代码本身（混合中文问句两路都会落空）
         s = get_settings()
+        lexical_query = extract_error_code(query) or query
         lexical_k = s.retrieval_lexical_top_k * (2 if intent == "ERROR_CODE" else 1)
         lexical, dense = await search_chunks(
-            query=query,
+            query=lexical_query,
             query_embedding=query_vec,
             device_id=device_id,
             version=version,
