@@ -121,3 +121,43 @@
 ### 下一步（对用户）
 
 - 将 PRD、技术规范、前端视觉方案放入工作区或提供可读取路径，随后执行 Phase 0 提示词；在此之前不初始化工程、不写业务代码。
+
+## 2026-08-19 · 交互 007 Phase 0 资料登记（ZCode 出具）
+
+### 源资料登记表
+
+| # | 类型 | 工作区路径（基线） | 标题 | 版本 / 日期 | 负责人 | 大小 | SHA-256（前 8 位） | 可读性 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | PRD | `docs/sources/H2 Manual Copilot｜氢能设备智能手册助手.md` | H2 Manual Copilot｜氢能设备智能手册助手 · 产品需求文档 PRD | v1.0 · 2026-08-19 | 未标注 | 23,041 B | a8e7b2fb | 全文可读 |
+| 2 | 技术规范 | `docs/sources/H2 Manual Copilot｜氢能设备智能手册助手 (1).md` | H2 Manual Copilot｜氢能设备智能手册助手 · 技术规范与系统设计文档 | v1.0 · 2026-08-19 | 未标注 | 35,026 B | 9e385d72 | 全文可读 |
+| 3 | 前端视觉方案 | `docs/sources/H2_Manual_Copilot_Frontend_Prototype.html` | H2 Manual Copilot · Frontend Prototype（单文件交互原型） | 文件内无版本号；文件时间 2026-08-19 17:00 +08:00 | 未标注 | 67,971 B | a3739cd9 | 全文可读，可浏览器打开 |
+
+登记说明：
+
+- 三份文件由用户提供于 `D:\EdgeDownload\`，已复制入库并提交（git `eaa3ef4`）；副本与原始文件 SHA-256 逐一比对一致，基线以 `docs/sources/` 下文件为准。
+- 两个 Markdown 原始文件名仅相差 "(1)"（浏览器下载去重后缀）：无后缀者为 PRD，带 "(1)" 者为技术规范，以文档内标题为准区分；入库保留原名便于追溯。
+- 三份文档均未标注负责人；前端原型文件内无版本号与日期，暂以文件系统时间与 SHA-256 作为基线标识（Q-009）。
+
+### 关键主题提取（目录级，不含实现结论）
+
+- **PRD**：产品定位与非目标、Persona A–E、场景 S1–S6、信息架构（Ask / Knowledge / Source Viewer / Admin）、4 个 MVP 页面、P0 功能 FR-001–FR-009、P1 功能 FR-101–FR-105、AI 行为规范 A1–A6、氢能安全标准清单、数据策略（5–15 份文档、HX-100 演示集、≥30 条测试问题）、成功指标 5 项、MVP DoD 12 条、3 分钟 Demo 黄金路径（6 幕）、路线图 V0.1–V1.0、风险矩阵。
+- **技术规范**：ADR-001–003（模块化单体、前后端分离、不用重型 Agent 框架）、技术栈（Next.js 16.x + FastAPI/Python 3.12 + PostgreSQL/pgvector + uv/pnpm）、仓库结构与分层原则、领域模型 9 实体、文档生命周期与发布状态、解析策略（PyMuPDF4LLM → MinerU fallback + Parser Protocol）、chunk 策略（350–700 tokens、结构优先切分）、embedding（text-embedding-v4 默认 / Qwen3 本地 / 向量版本化）、hybrid retrieval（tsvector + pgvector + RRF + qwen3-rerank，Top30→6）、生成架构（structured JSON 输出、evidence status、abstention、prompt 规范与注入防护）、API `/api/v1` + SSE 事件、鉴权（比赛匿名 + Admin 密码）、文件与密钥安全、可观测性（OpenTelemetry + Langfuse、日志红线）、性能预算（P95 ≤ 8s）、评测（golden dataset ≥30、安全测试集、回归门禁）、质量工具链（ruff/mypy/pytest、eslint/tsc/vitest/playwright）、部署方案、开发阶段 Phase 1–5、MVP 技术验收清单、生产就绪门。
+- **前端原型**：设计令牌（Apple 风格、明暗双主题、颜色/圆角/阴影/字体栈）、侧边栏导航（Ask / Knowledge / Evaluation / Settings）、Ask 工作区（设备/版本选择器、快捷问题、检索管线进度、结构化回答卡、引用徽章、右侧 Evidence 面板与评分环）、Knowledge Library 表格与筛选、Source Viewer 抽屉（模拟 PDF 页 + 高亮引用）、上传弹窗与 toast、响应式断点（1180/940/680/430）、reduced-motion、键盘快捷键（⌘K）。
+
+### 冲突与缺口清单（Phase 0 初步识别）
+
+| ID | 级别 | 内容 | 涉及与去向 |
+| --- | --- | --- | --- |
+| C-1 | 冲突 · P0 | 原型 Evidence 面板展示数值评分环（95/63/12）；技术规范 §44 明确禁止展示未经校准的置信度百分比，PRD 无评分环定义。需裁决：改为 evidence status 徽章（SUFFICIENT/PARTIAL/INSUFFICIENT/CONFLICTING）或保留评分环 | 原型 vs 技术规范 → Q-006 |
+| C-2 | 差异 · P0 | 页面范围不一致：PRD 信息架构含 Admin（Documents/Versions/Parsing/Feedback），无 Evaluation/Settings；原型无 Admin，含 Evaluation/Settings（当前为纯演示数据，无对应 API）。MVP 页面清单需裁决 | PRD vs 原型 → Q-007 |
+| C-3 | 差异 · P1 | PRD §19 描述三栏 Answer Workspace（左会话/中答案/右证据）；原型为两栏布局 + 侧边导航，设备选择器位于会话顶部 | PRD vs 原型（Phase 1 收敛时裁决） |
+| C-4 | 缺口 · P1 | PRD FR-009 反馈（👍/👎/🚩 及多选原因）在原型中仅部分呈现（Copy / Helpful / Safety concern） | PRD vs 原型（Phase 1 收敛时裁决） |
+| C-5 | 不一致 · P0 | PRD MVP DoD 含"支持中英文 Query"，但 FR-101 双语检索列为 P1；DoD 将迫使一个 P1 功能进入 MVP 验收 | PRD 内部 → Q-008 |
+| C-6 | 缺口 · P0 | 三份文档均无负责人；Q-004 冲突裁决人仍未指定，而 Phase 1 验收门要求 P0 决策关闭 | 全部文档 → Q-004 |
+| C-7 | 待定 · P1 | 技术规范要求 Next.js 16.x 锁定具体 patch 版本（当前发布线 16.3），版本号留待工程基线（Phase 3）确定并记录 | 技术规范 |
+
+### Phase 0 验收证据
+
+- T-001 完成：三类资料有工作区路径、版本或日期标识、SHA-256 哈希；副本与原件字节级一致（git 提交 `eaa3ef4`，3 文件 4386 行）。
+- 本阶段未初始化工程、未安装依赖、未写业务代码。
+- 进入 Phase 1 的前置：用户完成 Phase 0 人工检查点——确认三份资料版本基线、指定冲突裁决人（Q-004）、裁决 Q-006 / Q-007 / Q-008。
