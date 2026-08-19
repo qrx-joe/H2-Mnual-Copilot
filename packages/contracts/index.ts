@@ -48,15 +48,40 @@ export interface QueryRequest {
   conversation_id?: string;
 }
 
-/** SSE 事件载荷的判别联合（contracts.md §1.1 事件表）。 */
+/** SSE 事件载荷的判别联合（contracts.md §1.1，v1.2：done 新增 message_id/conversation_id）。 */
 export type QueryStreamEvent =
   | { event: "retrieval.started"; data: { request_id: string } }
   | { event: "retrieval.completed"; data: { chunk_ids: string[]; retrieval_ms: number } }
   | { event: "generation.started"; data: Record<string, never> }
   | { event: "generation.delta"; data: { text: string } }
   | { event: "verification.completed"; data: { evidence_status: EvidenceStatus } }
-  | { event: "done"; data: { request_id: string; answer: Answer; stub?: boolean } }
+  | {
+      event: "done";
+      data: {
+        request_id: string;
+        message_id?: string;
+        conversation_id?: string;
+        answer: Answer;
+      };
+    }
   | { event: "error"; data: ApiError };
+
+/** GET /sources/{chunk_id}（契约 §1.4）：Source Viewer 定位信息。 */
+export interface SourceInfo {
+  document: string;
+  document_id: string;
+  version: string;
+  page: number;
+  section_path: string;
+  excerpt: string;
+  file_url: string;
+}
+
+/** POST /messages/{id}/feedback 载荷（契约 §1.5，FR-009）。 */
+export interface FeedbackBody {
+  type: "HELPFUL" | "INCORRECT" | "SAFETY_CONCERN";
+  reasons?: string[];
+}
 
 /** 统一错误结构（技术规范 §104）。 */
 export interface ApiError {

@@ -46,6 +46,8 @@ export interface MockSource {
   page: number;
   trust: string;
   excerpt: string;
+  /** 真实链路才有：点击后 Source Viewer 用它拉取原始 PDF（T-020） */
+  chunkId?: string;
 }
 
 /** 回答卡数据模型：kind 对应原型 astatus 三态 + error（服务异常演示态）。 */
@@ -62,6 +64,8 @@ export interface AnswerModel {
   suggestedKeywords?: string[];
   errorCode?: string;
   errorMessage?: string;
+  /** 真实链路：assistant 消息 ID，反馈落库用（T-022） */
+  messageId?: string;
 }
 
 export type Scenario = "error" | "startup" | "safety" | "noanswer" | "failure";

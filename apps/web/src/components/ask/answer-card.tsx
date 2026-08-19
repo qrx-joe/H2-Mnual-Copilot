@@ -31,12 +31,20 @@ export function AnswerCard({ answer, onRetry }: { answer: AnswerModel; onRetry?:
   const toggleReason = (r: string) =>
     setSelectedReasons((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]));
 
-  const submitFeedback = (type: string) => {
-    toast({
-      tone: "success",
-      title: "Feedback saved",
-      message: `已记录${type}反馈${selectedReasons.length ? `（${selectedReasons.join("、")}）` : ""}。Phase 5 将写入数据库。`,
-    });
+  const submitFeedback = async (type: string, reasons: string[] = []) => {
+    // 真实链路：落库（T-022）；无 message_id（演示数据）时仅提示
+    if (answer.messageId) {
+      const apiType = type === "Safety concern" ? "SAFETY_CONCERN" : type === "Incorrect" ? "INCORRECT" : "HELPFUL";
+      try {
+        const { submitFeedback: post } = await import("@/lib/api");
+        await post(answer.messageId, apiType as "HELPFUL", reasons);
+        toast({ tone: "success", title: "Feedback saved", message: `已记录${type}反馈${reasons.length ? `（${reasons.join("、")}）` : ""}。` });
+      } catch {
+        toast({ tone: "info", title: "反馈提交失败", message: "后端不可达，反馈未保存。" });
+      }
+    } else {
+      toast({ tone: "success", title: "Feedback saved", message: `已记录${type}反馈（演示数据，不落库）。` });
+    }
     setFeedbackPanel(null);
     setSelectedReasons([]);
   };
@@ -192,7 +200,12 @@ export function AnswerCard({ answer, onRetry }: { answer: AnswerModel; onRetry?:
               <button
                 className="mt-2.5 h-8 rounded-full bg-blue px-3 text-[11px] font-semibold text-white hover:bg-blue-hover disabled:opacity-40"
                 disabled={selectedReasons.length === 0}
-                onClick={() => submitFeedback(feedbackPanel === "safety" ? "Safety concern" : "Incorrect")}
+                onClick={() =>
+                  submitFeedback(
+                    feedbackPanel === "safety" ? "Safety concern" : "Incorrect",
+                    selectedReasons,
+                  )
+                }
               >
                 提交
               </button>

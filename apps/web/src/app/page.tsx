@@ -22,12 +22,13 @@ type Entry =
   | { kind: "answer"; model: AnswerModel };
 
 /** 契约 Answer → 展示模型：四态映射（ADR-0005），冲突/拒答优先级高于普通态 */
-function toAnswerModel(a: ApiAnswer): AnswerModel {
+function toAnswerModel(a: ApiAnswer, messageId?: string): AnswerModel {
   if (a.abstain && a.abstain_reason === "CONFLICTING_VERSIONS") {
     return {
       kind: "warn", title: "检测到版本冲突", summary: a.answer, steps: [],
       safety: null, evidenceStatus: a.evidence_status, sources: [],
       relatedDocuments: a.related_documents, suggestedKeywords: a.suggested_keywords,
+      messageId,
     };
   }
   if (a.abstain) {
@@ -35,11 +36,12 @@ function toAnswerModel(a: ApiAnswer): AnswerModel {
       kind: "stop", title: "当前知识库无法可靠回答", summary: a.answer, steps: [],
       safety: null, evidenceStatus: a.evidence_status, sources: [],
       relatedDocuments: a.related_documents, suggestedKeywords: a.suggested_keywords,
+      messageId,
     };
   }
   const sources: MockSource[] = a.citations.map((c) => ({
     title: c.document_title, version: `v${c.version}`, page: c.page,
-    trust: "", excerpt: c.excerpt,
+    trust: "", excerpt: c.excerpt, chunkId: c.chunk_id,
   }));
   return {
     kind: a.evidence_status === "CONFLICTING" ? "warn" : "safe",
@@ -49,6 +51,7 @@ function toAnswerModel(a: ApiAnswer): AnswerModel {
     safety: a.safety_notice,
     evidenceStatus: a.evidence_status,
     sources,
+    messageId,
   };
 }
 
@@ -95,8 +98,8 @@ export default function AskPage() {
           } else if (ev.event === "generation.started") {
             setPipeline({ currentStep: 4 });
           } else if (ev.event === "done") {
-            const d = ev.data as { answer: ApiAnswer };
-            const model = toAnswerModel(d.answer);
+            const d = ev.data as { answer: ApiAnswer; message_id?: string };
+            const model = toAnswerModel(d.answer, d.message_id);
             setEntries((prev) => [...prev, { kind: "answer", model }]);
             setLastAnswer(model);
             setPipeline(null);

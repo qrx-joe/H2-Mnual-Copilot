@@ -80,6 +80,33 @@ export interface ApiDevice {
   current_version: string;
 }
 
+/** GET /sources/{chunk_id}（契约 §1.4）：Source Viewer 用它拿真实 PDF 与页码。 */
+export async function getSource(chunkId: string): Promise<{
+  document: string;
+  version: string;
+  page: number;
+  excerpt: string;
+  file_url: string;
+}> {
+  const resp = await fetch(`${API_BASE}/api/v1/sources/${chunkId}`);
+  if (!resp.ok) throw new Error(`sources ${resp.status}`);
+  return resp.json();
+}
+
+/** POST /messages/{id}/feedback（契约 §1.5，FR-009 落库）。 */
+export async function submitFeedback(
+  messageId: string,
+  type: "HELPFUL" | "INCORRECT" | "SAFETY_CONCERN",
+  reasons: string[],
+): Promise<void> {
+  const resp = await fetch(`${API_BASE}/api/v1/messages/${messageId}/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, reasons }),
+  });
+  if (!resp.ok) throw new Error(`feedback ${resp.status}`);
+}
+
 export async function listDevices(): Promise<ApiDevice[]> {
   const resp = await fetch(`${API_BASE}/api/v1/devices`);
   if (!resp.ok) throw new Error(`devices ${resp.status}`);
