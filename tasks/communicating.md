@@ -507,3 +507,41 @@
 ### 待确认
 
 - 用户刷新页面（必要时 Ctrl+F5 强刷）确认图标正常；Q-010/Q-011/Q-012 维持。
+
+## 2026-08-20 · 交互 014
+
+> 时间：2026-08-20 00:00—01:20 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 执行 Phase 6（质量、异常、安全与可观测性）。
+
+### AI 检查与行动
+
+- 后端（26ff81b/0e03c71）：溯源与文件流路由、消息/Citation 实体落库、反馈 API（幂等）、进程内限流、全链路超时降级、§69 结构化日志、HTTPException 契约化、安全测试集 5 用例。
+- 前端（a3d7d02）：抽屉内嵌真实 PDF 跳页（T-020）、反馈落库接线（T-022）、契约 v1.2（message_id）。
+- 评测（87f4319）：golden 30 条六类目 + run_eval.py；三轮迭代修复 5 个真实缺陷（阈值/停用词/哈希碰撞/路由收窄/alembic logger），最终 recall@citation 1.0、no-answer 1.0（22 可跑）。
+- 浏览器实测（新标签页）：快捷卡中文+代码问题→Grounded answer→引用 p.1→抽屉 Original PDF→Helpful 反馈落库（dev 库 feedback 表确认）。
+- 回归：API 26 测试全绿；web lint/vitest/build 全绿；矩阵证据回填 + `docs/phase6-quality-report.md`。
+- 任务状态：T-009/T-013/T-015/T-017—T-024 完成；T-014（FAILED 路径测试+MinerU）与 T-016（真实 LLM）因外部输入保持进行中。
+
+### 本智能体写入内容
+
+| 文件 | 写入内容 |
+| --- | --- |
+| `apps/api/src/h2copilot/**`（sources/feedback/ratelimit 新模块 + query/app/services 扩展） | Phase 6 横切能力 |
+| `apps/web`（drawer/answer-card/api/mock-data/page）与 `packages/contracts` | 前端接线与契约 v1.2 |
+| `evals/datasets/{golden.jsonl,build_docs.py}`、`evals/run_eval.py`、`evals/report.json` | 评测数据集与脚本 |
+| `docs/phase6-quality-report.md`、`docs/traceability-matrix.md` | 验证报告与证据回填 |
+| `tasks/{todo,next-todo,advice,communicating}.md` | 状态同步与交互 014 |
+
+### 本轮决定
+
+- Phase 6 验收门通过（T-009 完成、矩阵证据回填、阻塞项有归属）。
+- 距离阈值最终 0.78（Fake 层标定，Q-010 后重标定）；错误代码路由按 §38 收窄规则固化。
+- localhost:3000/:8000 保持运行供用户验收。
+
+### 待确认
+
+- Q-010（API Key）/ Q-011（真实 PDF）/ Q-012（视觉确认）维持；回复"执行 Phase 7"进入交付准备。

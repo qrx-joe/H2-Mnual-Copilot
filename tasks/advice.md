@@ -311,3 +311,30 @@
 - 距离阈值 0.95 是 FakeEmbedding 标定值，换真实模型必须重标定（已写入配置注释）。
 - 版本冲突 E2E 需双版本数据集（Phase 6）；Source Viewer 真实 PDF（T-020）与反馈落库（T-022）在 Phase 6。
 - Git Bash GBK 控制台发中文 JSON 会报 body parse 错误（用 UTF-8 文件体规避，API 本身正常）。
+
+## 2026-08-20 · 交互 014 Phase 6 质量与异常能力（ZCode 出具）
+
+### 交付（提交 26ff81b / a3d7d02 / 87f4319 / 0e03c71 及报告提交）
+
+- T-009：限流（429 契约结构）+ 全链路超时降级（SSE error）+ 拒答/隔离路径。
+- T-020：/sources + /files 路由；抽屉内嵌真实 PDF 跳页（浏览器实测 Original PDF）。
+- T-022：消息/引用实体落库 + 反馈 API（幂等）+ 前端接线（浏览器实测→DB 记录）。
+- T-023：golden 30 条 + `evals/run_eval.py`：**recall@citation 1.0 / no-answer 1.0**（22 可跑；8 条跨语言阻塞待 Q-010）。
+- T-024：安全测试集 5 用例全过（注入保持 data / 引用不编造 / 危险 fail-closed / 无据不编参数 / Admin 401）。
+- 可观测：§69 结构化查询日志（含"日志不含查询正文"红线断言）；HTTPException→契约错误结构。
+- 回归：API 26 测试全绿（ruff/mypy 全绿）；web lint/vitest/build 全绿。
+
+### 评测驱动修复的 5 个真实缺陷（每个都有测试/golden 锁定）
+
+dense 无阈值（no-answer 28.6%）→ 阈值 0.78；停用词污染；哈希桶碰撞（3 哈希位）；错误代码路由过宽（§38 收窄：纯代码或代码+非拉丁文本）；alembic fileConfig 禁用应用 logger。
+
+### 残余与风险
+
+- T-014 残余：FAILED 状态机路径的集成测试 + MinerU fallback（待 Q-011 真实样本）。
+- T-016 残余：真实 LLM provider（待 Q-010）；Faithfulness 指标同源阻塞。
+- Alembic downgrade 演练列入 Phase 7 发布清单。
+- IAB 浏览器标签页在多次 reload 后会退化（点击失效），换新标签页即恢复——环境问题非应用缺陷，已两次确认。
+
+### 验收门判定
+
+T-009 完成；核心需求证据已回填矩阵（`docs/traceability-matrix.md` Phase 6 节）；阻塞项均有归属（Q-010/Q-011）。**Phase 6 验收门通过。**
