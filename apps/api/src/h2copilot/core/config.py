@@ -1,0 +1,40 @@
+"""集中配置（技术规范 §96）。
+
+约束：检索参数等运行配置只允许出现在这里；
+禁止把 top_k 之类的数值散落在多个文件中。
+"""
+
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """应用配置。真实值来自环境变量或 .env（.env 不入库）。"""
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    app_name: str = "h2copilot-api"
+
+    # 基线阶段允许为空：/health 与 SSE 桩不依赖数据库和模型。
+    # Phase 5 接入真实链路时，以下字段将改为必填，缺失时启动即报可诊断错误。
+    database_url: str = ""
+    llm_provider: str = ""
+    llm_model: str = ""
+    embedding_provider: str = ""
+    embedding_model: str = ""
+    rerank_provider: str = ""
+    rerank_model: str = ""
+    admin_password: str = ""
+
+    # 检索参数（技术规范 §96 默认值；rerank_candidates 对应 §40 的 Top30 截断）
+    retrieval_dense_top_k: int = 20
+    retrieval_lexical_top_k: int = 20
+    rerank_top_k: int = 6
+    rerank_candidates: int = 30
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """进程内单例。测试如需覆盖环境变量，先调用 get_settings.cache_clear()。"""
+    return Settings()

@@ -1,0 +1,26 @@
+# Python (apps/api)
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node (apps/web, packages)
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# 环境与密钥：绝不提交真实凭据（技术规范 §66）
+.env
+.env.local
+.env.*.local
+
+# 本地数据卷（ADR-0007：MVP 对象存储）
+data/
+
+# 系统
+.DS_Store
+Thumbs.db
