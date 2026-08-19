@@ -394,3 +394,44 @@
 
 - Q-010：百炼 API Key 注入方式（Phase 5 前需要）。
 - Q-011：HX-100 演示 PDF 与 golden 问题素材（Phase 5 评测前需要）。
+
+## 2026-08-19 · 交互 011
+
+> 时间：2026-08-19 22:52—23:18 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 执行 Phase 4（视觉系统与前端骨架）。
+
+### AI 检查与行动
+
+- 从原型逐项提取 design tokens（语义色明暗双主题、四色+soft、圆角/阴影/字体栈/动效/布局尺寸）写入 `globals.css`（Tailwind v4 CSS-first）；字体按原型用系统栈（弃用 Geist，规避 Google Fonts 网络风险）。
+- 实现页面壳层与组件：Ask（会话+Evidence 双栏、四态回答卡、管线进度、完整反馈 FR-009、设备选择）、Knowledge（表格/筛选/搜索/上传）、Source Viewer 抽屉、上传弹窗；无 Evaluation/Settings 路由（ADR-0006）。`lib/sse.ts` 作为 Phase 5 解析 seam，vitest 5 通过。
+- 生产构建 + `next start` + IAB 浏览器实测：状态全覆盖（正常/空/拒答/错误+Retry/禁用/明暗主题/390px 响应式/抽屉/ESC）；主题计算样式与原型 token 逐值一致。
+- **发现并修复真实布局缺陷**：`<main>` 缺 `grid-column:2`（原型对应规则遗漏）导致主内容被 fixed 侧边栏遮挡；DOM 快照不可见，浏览器交互实测捕获；修复重建后全链路复测通过。
+- lint 首轮 2 处 set-state-in-effect（React hooks 新规则）：主题改为纯 CSS 驱动、删除冗余路由 effect，复测全绿。
+- 新增 Q-012（用户视觉确认）；T-018—T-022 置为进行中（壳层完成，待接真实数据）；服务保留在 localhost:3000 供用户查看。
+
+### 本智能体写入内容
+
+| 文件 | 写入内容 |
+| --- | --- |
+| `apps/web/src/app/globals.css`、`layout.tsx`、`page.tsx`、`knowledge/page.tsx` | tokens、壳层、Ask/Knowledge 页面 |
+| `apps/web/src/components/**`（12 个文件） | shell/ask/source-viewer/upload/ui 组件 |
+| `apps/web/src/lib/mock-data.ts`、`sse.ts`、`sse.test.ts` | 固定演示数据、SSE 解析 seam 与测试 |
+| `docs/phase4-visual-baseline.md` | 对照报告：状态验证清单、缺陷修复、有意差异 D-1—D-5、已知简化、验收门判定 |
+| `tasks/question.md` | 新增 Q-012（中途误删 Q-010 已补回） |
+| `tasks/todo.md` | T-018—T-022 → 进行中 |
+| `tasks/advice.md`、`tasks/next-todo.md`、`tasks/communicating.md` | 交互 011 记录与下一步 |
+
+### 本轮决定
+
+- Phase 4 验收门有条件通过：条件为 Q-012 用户确认（浏览器实测证据充分，像素级确认留给用户）。
+- 图片截图受会话回显限制，核对以 DOM 快照+计算样式为准（证据边界已写入报告）。
+- localhost:3000 服务保持运行，供用户直接查看。
+
+### 待确认
+
+- Q-012：视觉还原度确认（打开 localhost:3000）。
+- Q-010 / Q-011：维持（Phase 5 硬前置）。

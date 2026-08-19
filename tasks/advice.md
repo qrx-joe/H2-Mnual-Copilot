@@ -263,3 +263,24 @@
 ### 未覆盖风险（承接 engineering-baseline.md §5）
 
 - API 未连接真实数据库（T-013 起）；CI 未实际触发（无远端）；pnpm 的 esbuild 构建脚本未批准（vitest 可用，必要时 `pnpm approve-builds`）；Docker Desktop 需手动启动（README 已注明）。
+
+## 2026-08-19 · 交互 011 Phase 4 视觉系统与前端骨架（ZCode 出具）
+
+### 交付物
+
+- Design tokens：`apps/web/src/app/globals.css`（Tailwind v4 CSS-first；语义色明暗双主题、品牌四色+soft、圆角/阴影/字体/动效/布局尺寸，逐项取自原型；字体按原型系统栈，弃用脚手架的 Geist）。
+- 页面壳层：Ask（会话+Evidence 双栏）、Knowledge（表格+筛选+搜索）、Source Viewer 抽屉、上传弹窗（简化 Admin）；无 Evaluation/Settings 路由（ADR-0006）。
+- 组件状态：回答卡四态（safe/warn/stop/error）、管线进度、Evidence 徽章+来源卡+空态、反馈完整版（👍/👎/🚩+原因多选）、设备选择、toast、明暗主题（CSS 驱动，无状态同步 effect）。
+- `lib/sse.ts`：SSE 解析 seam（Phase 5 直接接真实流）；vitest 5 通过。
+- 验证报告：`docs/phase4-visual-baseline.md`。
+
+### 浏览器实测结论（IAB/Chromium，生产构建）
+
+- 状态覆盖：正常/空/拒答/错误（MODEL_UNAVAILABLE+Retry）/禁用/明暗主题（计算样式与原型 token 逐值一致）/响应式 390px（汉堡+抽屉）/Source Viewer（摘录与 Evidence 逐字一致）/ESC 键盘。
+- **发现并修复真实布局缺陷**：`<main>` 缺 `grid-column:2`（原型 `.main{grid-column:2}` 遗漏），主内容被 fixed 侧边栏遮挡——DOM 快照无法发现，浏览器交互实测捕获；修复后全链路复测通过。
+- 证据边界：截图已通过浏览器输出，但 ZCode 会话内无法回看图像；核对以 DOM 快照+计算样式为准，像素级确认留给用户（Q-012，服务已在 localhost:3000 运行）。
+
+### 待确认
+
+- Q-012：用户浏览器查看后确认视觉还原度（Phase 4 验收门条件）。
+- 维持 Q-010/Q-011（Phase 5 硬前置）。

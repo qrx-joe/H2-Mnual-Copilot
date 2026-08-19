@@ -93,7 +93,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileNavOpen(false)}
           />
         )}
-        <main className="min-w-0">
+        {/*
+         * 侧边栏是 fixed 定位（脱离文档流），grid 第一列只负责留出空间；
+         * main 必须显式放入第二列（原型 .main{grid-column:2}），
+         * 否则 main 会挤进 244px 的第一列并被侧边栏盖住。
+         */}
+        <main className="min-w-0 [grid-column:2]">
           <Topbar onOpenMobileNav={() => setMobileNavOpen(true)} />
           {children}
         </main>

@@ -14,11 +14,11 @@
 | T-015 | 待办 | P0 | Hybrid 检索管线：intent 分类（含错误代码 regex 路由）+ metadata 过滤 + 双路召回 + RRF + rerank | E104 精确命中；语义问题召回正确；设备/版本过滤生效 | T-014；FR-002/004/005、FR-101 |
 | T-016 | 待办 | P0 | 生成与验证：LLM provider adapter + 结构化 JSON + citation 校验 + abstention + safety notice + 版本冲突提示 | 无证据拒答；引用均来自真实检索；A1–A6 生效 | T-015；FR-003/006/008、FR-101 |
 | T-017 | 待办 | P0 | Query API 与 SSE 流式：`POST /api/v1/query` + 事件序列 + 统一错误结构 | 前端可消费进度事件；错误码符合技术规范 §105 | T-016；FR-002、DoD |
-| T-018 | 待办 | P0 | Ask 页面：设备/版本选择、输入框、快捷入口、管线进度、回答卡、加载/空/错误状态 | 对照原型可逐项核对；键盘可用 | T-017、视觉基线；FR-002/005/008 |
-| T-019 | 待办 | P0 | Evidence 面板：evidence status 徽章 + 来源卡列表 | 四态徽章（SUFFICIENT/PARTIAL/INSUFFICIENT/CONFLICTING）；来源卡含文档/版本/页码/摘录 | T-018；FR-003、Q-006 |
-| T-020 | 待办 | P0 | Source Viewer：citation 点击打开 PDF 对应页并高亮 | E2E：ask→citation→页面定位（Demo Scene 4） | T-018；FR-007 |
-| T-021 | 待办 | P0 | Knowledge 页与简化 Admin：文档表格 + 上传入口 + 解析状态 | 列表与状态真实反映数据库；上传走真实管线 | T-014、T-018；FR-001、Q-007 |
-| T-022 | 待办 | P0 | 反馈：👍/👎/🚩 + 原因多选，落库 | 反馈可查询；视觉按 PRD §31（原型部分呈现按 PRD 补齐） | T-018；FR-009、基线 §8.2 |
+| T-018 | 进行中 | P0 | Ask 页面：设备/版本选择、输入框、快捷入口、管线进度、回答卡、加载/空/错误状态 | 对照原型可逐项核对；键盘可用 | T-017、视觉基线；FR-002/005/008 |
+| T-019 | 进行中 | P0 | Evidence 面板：evidence status 徽章 + 来源卡列表 | 四态徽章（SUFFICIENT/PARTIAL/INSUFFICIENT/CONFLICTING）；来源卡含文档/版本/页码/摘录 | T-018；FR-003、Q-006 |
+| T-020 | 进行中 | P0 | Source Viewer：citation 点击打开 PDF 对应页并高亮 | E2E：ask→citation→页面定位（Demo Scene 4） | T-018；FR-007 |
+| T-021 | 进行中 | P0 | Knowledge 页与简化 Admin：文档表格 + 上传入口 + 解析状态 | 列表与状态真实反映数据库；上传走真实管线 | T-014、T-018；FR-001、Q-007 |
+| T-022 | 进行中 | P0 | 反馈：👍/👎/🚩 + 原因多选，落库 | 反馈可查询；视觉按 PRD §31（原型部分呈现按 PRD 补齐） | T-018；FR-009、基线 §8.2 |
 | T-023 | 待办 | P0 | Golden dataset 与评测：≥30 条（Easy/Exact/Semantic/Cross-language/Version/No-answer）+ 指标脚本 | Recall@5/Faithfulness/No-answer 可重复计算并输出报告 | T-015、T-016；PRD §49–53 |
 | T-024 | 待办 | P0 | 安全测试集：injection/citation attack/dangerous/unsupported 用例 | 全部用例按预期拒答或隔离 | T-016；技术规范 §82、A3 |
 | T-025 | 待办 | P1 | P1 增强：Error Code 快捷入口、推荐问题、版本管理界面化、可信等级展示 | 演示加分项，MVP 后视余量逐项实现 | T-018+；FR-102–105 |
