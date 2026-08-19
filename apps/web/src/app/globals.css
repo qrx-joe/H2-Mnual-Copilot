@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens —— 逐项提取自前端原型（docs/sources/H2_Manual_Copilot_Frontend_Prototype.html，基线 a3739cd9）。
+ * 变更规则：先对照原型确认差异，再改这里；差异记录在 docs/phase4-visual-baseline.md。
+ *
+ * 结构说明（Tailwind v4 CSS-first）：
+ * - 原始调色板/圆角/阴影/字体：固定值，写在 @theme（明暗主题共用）。
+ * - 语义色（canvas/surface/ink...）：CSS 变量按 .dark 重定义，经 @theme inline 暴露为工具类。
+ * - 与脚手架模板的差异：模板使用 Geist（Google Fonts），这里按原型改回系统字体栈，
+ *   同时规避国内构建环境拉取 Google Fonts 的网络风险。
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 语义色：浅色主题（原型 :root） */
+  --app-ink: #1d1d1f;
+  --app-ink-2: #6e6e73;
+  --app-ink-3: #86868b;
+  --app-line: #d2d2d7;
+  --app-line-soft: rgba(29, 29, 31, 0.08);
+  --app-canvas: #f5f5f7;
+  --app-surface: #ffffff;
+  --app-surface-2: #fbfbfd;
+  --app-surface-3: #f0f0f2;
+  --app-glass: rgba(255, 255, 255, 0.78);
+}
+
+.dark {
+  /* 语义色：深色主题（原型 body[data-theme="dark"]） */
+  --app-ink: #f5f5f7;
+  --app-ink-2: #a1a1a6;
+  --app-ink-3: #86868b;
+  --app-line: #3a3a3c;
+  --app-line-soft: rgba(255, 255, 255, 0.09);
+  --app-canvas: #000000;
+  --app-surface: #1c1c1e;
+  --app-surface-2: #242426;
+  --app-surface-3: #2c2c2e;
+  --app-glass: rgba(28, 28, 30, 0.8);
+  /* 深色下阴影加深（原型 dark 覆盖） */
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-e2: 0 8px 30px rgba(0, 0, 0, 0.3);
+  --shadow-e3: 0 18px 60px rgba(0, 0, 0, 0.48);
+}
+
+@theme {
+  /* 品牌与状态色（原型 --blue/--green/--orange/--red，含 soft 底色） */
+  --color-blue: #0071e3;
+  --color-blue-hover: #0077ed;
+  --color-blue-soft: rgba(0, 113, 227, 0.1);
+  --color-green: #34c759;
+  --color-green-soft: rgba(52, 199, 89, 0.11);
+  --color-orange: #ff9500;
+  --color-orange-soft: rgba(255, 149, 0, 0.12);
+  --color-red: #ff3b30;
+  --color-red-soft: rgba(255, 59, 48, 0.1);
+
+  /* 圆角（原型 --r8/--r12/--r18/--r24；胶囊用 rounded-full） */
+  --radius-r2: 12px;
+  --radius-r3: 18px;
+  --radius-r4: 24px;
+
+  /* 阴影三级（原型 --shadow1/2/3） */
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.035);
+  --shadow-e2: 0 8px 30px rgba(0, 0, 0, 0.07);
+  --shadow-e3: 0 18px 60px rgba(0, 0, 0, 0.12);
+
+  /* 字体：原型系统字体栈（中文回退 PingFang SC / Microsoft YaHei） */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* 动效（原型 --ease/--spring） */
+  --ease-app: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-spring: cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  /* 布局尺寸（原型 --sidebar/--topbar） */
+  --spacing-sidebar: 244px;
+  --spacing-topbar: 56px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--app-ink);
+  --color-ink-2: var(--app-ink-2);
+  --color-ink-3: var(--app-ink-3);
+  --color-line: var(--app-line);
+  --color-line-soft: var(--app-line-soft);
+  --color-canvas: var(--app-canvas);
+  --color-surface: var(--app-surface);
+  --color-surface-2: var(--app-surface-2);
+  --color-surface-3: var(--app-surface-3);
+  --color-glass: var(--app-glass);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background: var(--app-canvas);
+    color: var(--app-ink);
+    font-size: 15px;
+    line-height: 1.47;
+  }
+
+  ::selection {
+    background: rgba(0, 113, 227, 0.2);
+  }
+
+  /* 可访问性底线（PRD §55）：键盘焦点必须可见，不依赖鼠标悬停 */
+  :focus-visible {
+    outline: 3px solid rgba(0, 113, 227, 0.28);
+    outline-offset: 2px;
+  }
+
+  /* 原型 prefers-reduced-motion：尊重系统减弱动效设置 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* 响应式断点约定（原型 1180/940/680/430）：
+ * Tailwind 默认断点与原型不一致，这里统一用任意值变体（如 max-[940px]:）精确复刻原型断点。 */
