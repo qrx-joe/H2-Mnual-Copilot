@@ -4,16 +4,18 @@
 
 ## 当前
 
-1. **执行 Phase 2：架构边界、调用链与契约**
-   - 输入：`docs/implementation-baseline.md` + `docs/traceability-matrix.md` + 技术规范 v1.0。
-   - 动作：使用 `tasks/zcode-execution-plan.md` 的 Phase 2 提示词，产出运行入口、模块边界、主调用链、数据流、接口/数据契约、错误与降级策略、关键决策记录（ADR）；对 `tasks/advice.md` 交互 008 的 6 条未验证假设做最小技术验证（验证代码与生产实现隔离）。
-   - 验证：主链路无阻塞性 P0 架构问题；每项结论标注证据层级（代码推断/本地验证/真实环境证据）。
+1. **执行 Phase 3：工程基线**
+   - 输入：`docs/architecture/system-design.md` + `docs/architecture/contracts.md` + ADR-0001—0007 + 技术规范 §11（仓库结构）。
+   - 动作：按系统设计 §1 建立最小工程（apps/web + apps/api + packages/contracts + infra/compose + evals 骨架），锁定 Python 3.12 / Next.js 16.3.1（复查当日 latest），落实 `PYTHONUTF8=1`、.gitignore（data/、.env*）；建立 lint/typecheck/最小测试与 SSE 冒烟；实际运行并记录命令与输出。
+   - 验证：T-007 完成——新环境可按文档复现安装、启动与检查；V-3（pgvector 集成测试）与 V-6（SSE 冒烟）落为本地验证证据。
 
-2. **并行准备（用户侧，不阻塞 Phase 2）**
-   - 准备 HX-100 演示文档集（Operation/Maintenance/Safety/Error Codes，PRD §47–48）与 ≥30 条 golden 问题的原始素材。
+2. **用户侧并行输入（不阻塞 Phase 3，阻塞 Phase 5）**
+   - Q-010：提供百炼 API Key 的注入方式（.env.local，不入库）。
+   - Q-011：提供 HX-100 演示 PDF 集与 golden 问题素材。
 
 ## 暂不执行
 
 - Evaluation / Settings 页面实现（已裁决不进 MVP，仅作视觉参考）。
 - Evidence 数值评分环实现（已裁决改为状态徽章）。
+- 真实付费 API 调用（等 Q-010 凭据与授权）。
 - 未经确认向外部任务系统同步或发布内容。

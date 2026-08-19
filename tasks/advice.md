@@ -202,3 +202,34 @@
 - **Demo 依赖外部服务**：MVP 主链路依赖百炼 embedding/rerank/LLM 与 PostgreSQL，Demo 环境的网络与配额风险需在 Phase 2 验证并准备降级预案（技术规范 §106–107）。
 - **演示 PDF 尚不存在**：PRD §47–48 要求的 HX-100 演示文档集与 ≥30 条 golden 问题需要人工构建，属于关键路径输入，建议在 Phase 3 工程基线期间并行准备。
 - **跨语言为 P0 后**：评测集必须包含 Cross-language 类问题（T-023），否则 Metric 无法覆盖该裁决。
+
+## 2026-08-19 · 交互 009 Phase 2 架构固化与风险验证（ZCode 出具）
+
+### 交付物
+
+- `docs/architecture/system-design.md`：运行入口、模块职责、三条主调用链（问答/接入/溯源，含各步超时预算与失败分支）、数据流与归属表、横切边界（鉴权/限流/超时重试/幂等/降级/日志红线/成本/隐私）、配置地图、测试地图、MVP→生产演进差异、验证结论证据层级表。
+- `docs/architecture/contracts.md`：REST API（query/documents/ingest/sources/feedback〔新增〕/devices〔新增〕）、SSE 事件载荷、数据契约（实体约束与状态机）、枚举、Provider 协议、统一错误结构与 HTTP 映射；〔新增〕项均注明 PRD 来源，Phase 3 评审确认。
+- `docs/adr/0001—0007`：pgvector 单底座、显式管线、只读设备边界、版本感知检索、evidence 徽章、MVP 范围裁决、MVP 本地对象存储（解决原始 PDF 数据归属）。
+- `scratch/phase2/`：V-1/V-2 验证脚本与 `RESULTS.md`（隔离代码，可删除）。
+
+### 验证结论（证据层级）
+
+| 假设 | 结论 | 层级 |
+| --- | --- | --- |
+| V-1 RRF/错误代码路由 | 11/11 断言通过，纯逻辑方案成立 | 本地验证 |
+| V-2 PyMuPDF4LLM | 机制级 9/9 通过；**关键发现：页码溯源必须 `page_chunks=True`，页码取 `metadata.page_number`（1 起算）**，已固化进系统设计 §3.2 与 T-014 约束 | 本地验证（机制级） |
+| V-3 pgvector hybrid SQL | 未运行，Phase 3 集成测试落证据 | 推断 |
+| V-4 embedding/rerank 质量 | 阻塞于 API 凭据（Q-010）与演示 PDF（Q-011） | 待验证 |
+| V-5 Next.js 版本 | latest=16.3.1，Phase 3 锁定候选（锁定日复查） | 本地验证 |
+| V-6 SSE | 低风险，Phase 3 冒烟测试落证据 | 推断 |
+
+### 验收门判定
+
+主链路接口与数据归属已全部闭合：问答链路每步有契约（contracts §1）、原始文件归属明确（ADR-0007）、版本归属明确（ADR-0004）、反馈与设备列表两个规范未定义的接口已按 PRD 推导并标注〔新增〕。**Phase 2 验收门通过，可进入 Phase 3。**
+
+### 新风险与环境备注
+
+1. Windows 控制台 GBK 编码在 uv 子进程读取时产生 UnicodeDecodeError 噪音（不影响结果）；Phase 3 统一 `PYTHONUTF8=1`。
+2. 本机 Python 3.13，规范要求 3.12；uv 临时环境已验证 3.12 可用，工程基线以 `.python-version` 锁定。
+3. `import fitz` 已弃用，统一 `import pymupdf`。
+4. pymupdf4llm 依赖较重（onnxruntime/pymupdf-layout，12 包约 90MB），Docker 镜像体积需在 Phase 3 关注。

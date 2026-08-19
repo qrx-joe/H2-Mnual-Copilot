@@ -303,3 +303,47 @@
 ### 待确认
 
 - 无阻塞项；Phase 2（架构边界与契约）等待用户指令。
+
+## 2026-08-19 · 交互 009
+
+> 时间：2026-08-19 22:11—22:25 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 执行 Phase 2（架构边界、调用链与契约）。
+
+### AI 检查与行动
+
+- 探测工具链：Python 3.13.6/uv 0.11.14、Node 24/pnpm 10、Docker 29.4.1 可用；记录本机 3.13 与规范 3.12 的差异（uv 锁定解决）。
+- 产出 `docs/architecture/system-design.md`（提交 `9f206cb`）：运行入口、模块职责、问答/接入/溯源三条调用链（含超时预算与失败分支）、数据流与归属、横切边界、配置与测试地图、MVP→生产差异、验证结论表。
+- 产出 `docs/architecture/contracts.md`（同提交）：REST/SSE/数据/枚举/Provider 协议/错误结构；反馈与设备列表两个〔新增〕接口按 PRD 推导并标注待评审。
+- 固化 ADR-0001—0007（提交 `51b7bb6`），其中 ADR-0007 决定 MVP 原始 PDF 存本地卷（LocalFS 适配器），关闭数据归属问题。
+- 最小风险验证（提交 `75e9fe5`，脚本在 `scratch/phase2/`）：V-1 纯逻辑 11/11 通过；V-2 PyMuPDF4LLM 机制级 9/9 通过，首轮发现默认模式无页码标记，修正为 `page_chunks=True` + `metadata.page_number`；V-5 Next.js latest=16.3.1；V-3/V-4/V-6 分别留待 Phase 3 集成测试、API 凭据、冒烟测试。
+- 新增 Q-010（百炼 API Key）、Q-011（演示 PDF 与 golden 素材）两个待确认问题。
+- 未实现产品功能、未调用付费 API、未起容器。
+
+### 本智能体写入内容
+
+| 文件 | 写入内容 |
+| --- | --- |
+| `docs/architecture/system-design.md` | 新建：系统设计与调用链 |
+| `docs/architecture/contracts.md` | 新建：接口与数据契约 |
+| `docs/adr/0001—0007.md` | 新建：7 项架构决策记录 |
+| `scratch/phase2/`（3 个文件） | 新建：V-1/V-2 验证脚本与 RESULTS.md |
+| `tasks/question.md` | 新增 Q-010、Q-011 |
+| `tasks/advice.md` | 新增交互 009：交付物、验证证据层级、验收门判定、环境备注 |
+| `tasks/next-todo.md` | 当前动作改为 Phase 3 + 用户侧并行输入 |
+| `tasks/communicating.md` | 新增本条交互 009 |
+
+### 本轮决定
+
+- Phase 2 验收门通过：主链路接口与数据归属无未决项，可进入 Phase 3。
+- ingestion 页码溯源契约固定为 `page_chunks=True` / `metadata.page_number`（V-2 实证），写入系统设计与 T-014 约束。
+- Next.js 锁定候选 16.3.1，锁定动作在 Phase 3 并当日复查。
+- 付费 API 验证（V-4）在凭据到位并获授权前不执行。
+
+### 待确认
+
+- Q-010：百炼 API Key 注入方式（Phase 5 前需要）。
+- Q-011：HX-100 演示 PDF 与 golden 问题素材（Phase 5 评测前需要）。
