@@ -10,6 +10,12 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.29",
+    "alembic>=1.13",
+    "pgvector>=0.3",
+    "pymupdf4llm>=0.0.17",
+    "python-multipart>=0.0.9",
 ]
 
 [dependency-groups]
@@ -31,10 +37,13 @@ packages = ["src/h2copilot"]
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+exclude = ["alembic/versions"]  # 自动生成代码
 
 [tool.ruff.lint]
 # E/F 基础正确性；I 导入排序；UP 现代语法；B 常见缺陷
 select = ["E", "F", "I", "UP", "B"]
+# UP042（改用 StrEnum）：str+Enum 与 SQLAlchemy Enum 列映射兼容性已验证，不改写
+ignore = ["UP042"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -47,3 +56,7 @@ warn_redundant_casts = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+
+[[tool.mypy.overrides]]
+module = "pymupdf4llm"
+ignore_missing_imports = true

@@ -19,10 +19,10 @@ def test_env_override(monkeypatch) -> None:
 
 def test_get_settings_is_cached_and_clearable(monkeypatch) -> None:
     get_settings.cache_clear()
-    monkeypatch.setenv("DATABASE_URL", "postgresql://x")
-    assert get_settings().database_url == "postgresql://x"
+    monkeypatch.setenv("RERANK_TOP_K", "8")
+    assert get_settings().rerank_top_k == 8
     assert get_settings() is get_settings()  # 单例
     get_settings.cache_clear()
-    monkeypatch.delenv("DATABASE_URL")
-    assert get_settings().database_url == ""
+    monkeypatch.delenv("RERANK_TOP_K")
+    assert get_settings().rerank_top_k == 6  # 回到默认（.env 不含该项）
     get_settings.cache_clear()

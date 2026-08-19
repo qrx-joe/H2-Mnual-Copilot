@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # 基线阶段允许为空：/health 与 SSE 桩不依赖数据库和模型。
     # Phase 5 接入真实链路时，以下字段将改为必填，缺失时启动即报可诊断错误。
     database_url: str = ""
+    # ADR-0007：留空 = LocalFS（data/storage/）；生产填 S3/MinIO 地址换适配器
+    object_storage_url: str = ""
+    object_storage_bucket: str = ""
     llm_provider: str = ""
     llm_model: str = ""
     embedding_provider: str = ""
@@ -32,6 +35,10 @@ class Settings(BaseSettings):
     retrieval_lexical_top_k: int = 20
     rerank_top_k: int = 6
     rerank_candidates: int = 30
+    # 向量路相似度阈值（余弦距离上限）：无阈值时 ORDER BY 距离必然返回 k 条"最近邻"，
+    # 无关查询会被当作有证据——拒答路径（FR-006）依赖此过滤。
+    # 0.95 适配 FakeEmbedding（无共享词 ≈ 正交，距离 ≈ 1）；真实 embedding 需重标定。
+    retrieval_dense_max_distance: float = 0.95
 
 
 @lru_cache
