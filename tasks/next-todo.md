@@ -4,15 +4,13 @@
 
 ## 当前
 
-1. **执行 Phase 1：目标收敛、MVP 与追踪矩阵（检查点已通过，可执行）**
-   - 输入：`docs/sources/` 三类源资料 + 已关闭的 P0 决策（Q-004/Q-006/Q-007/Q-008，见 `tasks/question.md` 已解决表）。
-   - 动作：使用 `tasks/zcode-execution-plan.md` 的 Phase 1 提示词，生成一页实施基线与“需求—技术—视觉—任务—验收”追踪矩阵；按裁决确定 MVP 垂直闭环（页面：Ask / Knowledge / Source Viewer + 简化 Admin；跨语言为 P0；Evidence 用状态徽章）与非目标。
-   - 验证：T-002、T-006 完成；核心需求无孤立项；C-3、C-4 按 PRD＞原型规则收敛。
+1. **执行 Phase 2：架构边界、调用链与契约**
+   - 输入：`docs/implementation-baseline.md` + `docs/traceability-matrix.md` + 技术规范 v1.0。
+   - 动作：使用 `tasks/zcode-execution-plan.md` 的 Phase 2 提示词，产出运行入口、模块边界、主调用链、数据流、接口/数据契约、错误与降级策略、关键决策记录（ADR）；对 `tasks/advice.md` 交互 008 的 6 条未验证假设做最小技术验证（验证代码与生产实现隔离）。
+   - 验证：主链路无阻塞性 P0 架构问题；每项结论标注证据层级（代码推断/本地验证/真实环境证据）。
 
-2. **执行 Phase 2：架构边界与契约**
-   - 输入：实施基线 + 技术规范。
-   - 动作：运行入口、模块边界、主调用链、接口/数据契约、错误与降级策略；对高风险假设做最小验证。
-   - 验证：主链路无阻塞性 P0 架构问题。
+2. **并行准备（用户侧，不阻塞 Phase 2）**
+   - 准备 HX-100 演示文档集（Operation/Maintenance/Safety/Error Codes，PRD §47–48）与 ≥30 条 golden 问题的原始素材。
 
 ## 暂不执行
 

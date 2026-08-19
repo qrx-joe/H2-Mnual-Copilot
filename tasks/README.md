@@ -14,6 +14,12 @@
 
 - [`zcode-execution-plan.md`](./zcode-execution-plan.md)：供 ZCode 按阶段执行的目标、任务、验收门和可复制提示词。
 
+项目交付文档（`docs/`）：
+
+- [`docs/implementation-baseline.md`](../docs/implementation-baseline.md)：一页实施基线（Phase 1 产出）。
+- [`docs/traceability-matrix.md`](../docs/traceability-matrix.md)：需求追踪矩阵（Phase 1 产出）。
+- [`docs/sources/`](../docs/sources/)：三类源资料登记基线（Phase 0 入库）。
+
 ## 维护约定
 
 1. 每轮项目交互结束前更新 `communicating.md`，写明 Asia/Shanghai 时间、交互编号、智能体身份、该智能体实际写入的文件和内容摘要。
