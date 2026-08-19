@@ -2,27 +2,42 @@
 
 /**
  * 输入区（原型 .composer + .device 下拉）。
- * 设备/版本选择是 FR-005 的交互入口：回答与设备绑定，切换设备以 toast 明示。
+ * Phase 5：设备列表来自真实 GET /devices（空时回落演示数据）；
+ * 提交回调携带设备 ID（FR-005：答案与设备绑定）。
  */
 
 import { useEffect, useRef, useState } from "react";
 
 import { useUI } from "@/components/shell/ui-context";
 import { Icon } from "@/components/ui/icon";
+import type { ApiDevice } from "@/lib/api";
 import { MOCK_DEVICES } from "@/lib/mock-data";
 
 export function Composer({
   busy,
   onSubmit,
+  devices,
 }: {
   busy: boolean;
-  onSubmit: (query: string) => void;
+  onSubmit: (query: string, deviceId: string) => void;
+  devices: ApiDevice[];
 }) {
   const { toast } = useUI();
   const [text, setText] = useState("");
-  const [device, setDevice] = useState(MOCK_DEVICES[0]);
+  const [deviceId, setDeviceId] = useState("hx100");
   const [deviceOpen, setDeviceOpen] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
+
+  // 设备选项：后端列表优先，回落演示数据；选中项派生计算（无 DOM→state 同步 effect）
+  const options: { id: string; name: string; version: string }[] =
+    devices.length > 0
+      ? devices.map((d) => ({
+          id: d.device_id,
+          name: d.name,
+          version: d.current_version ? `v${d.current_version}` : "",
+        }))
+      : MOCK_DEVICES.map((d) => ({ id: d.id, name: d.name, version: d.currentVersion }));
+  const device = options.find((o) => o.id === deviceId) ?? options[0];
 
   // 自动增高（原型 oninput 逻辑），上限 150px
   useEffect(() => {
@@ -36,7 +51,7 @@ export function Composer({
     const q = text.trim();
     if (!q || busy) return;
     setText("");
-    onSubmit(q);
+    onSubmit(q, device.id);
   };
 
   return (
@@ -73,7 +88,9 @@ export function Composer({
               </span>
               <span className="text-left">
                 <strong className="block text-[11px] leading-tight">{device.name}</strong>
-                <small className="block text-[9px] leading-tight text-ink-3">Current manual · {device.currentVersion}</small>
+                <small className="block text-[9px] leading-tight text-ink-3">
+                  Current manual · {device.version || "—"}
+                </small>
               </span>
               <Icon name="down" className="h-[15px] w-[15px] text-ink-3" />
             </button>
@@ -82,7 +99,7 @@ export function Composer({
                 role="listbox"
                 className="absolute bottom-[calc(100%+7px)] left-0 z-50 w-[260px] rounded-[14px] border border-line-soft bg-surface p-1.5 shadow-e3"
               >
-                {MOCK_DEVICES.map((d) => (
+                {options.map((d) => (
                   <li key={d.id}>
                     <button
                       role="option"
@@ -91,14 +108,14 @@ export function Composer({
                         d.id === device.id ? "bg-surface-3" : ""
                       }`}
                       onClick={() => {
-                        setDevice(d);
+                        setDeviceId(d.id);
                         setDeviceOpen(false);
-                        toast({ tone: "info", title: "Device context updated", message: `${d.name} · ${d.currentVersion}` });
+                        toast({ tone: "info", title: "Device context updated", message: `${d.name} · ${d.version || "—"}` });
                       }}
                     >
                       <span className="min-w-0 flex-1">
                         <strong className="block text-[11px]">{d.name}</strong>
-                        <small className="block text-[9px] text-ink-3">Current manual · {d.currentVersion}</small>
+                        <small className="block text-[9px] text-ink-3">Current manual · {d.version || "—"}</small>
                       </span>
                       {d.id === device.id && <Icon name="check" className="h-[15px] w-[15px] text-blue" />}
                     </button>

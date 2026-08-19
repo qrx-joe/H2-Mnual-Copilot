@@ -1,16 +1,16 @@
 "use client";
 
 /**
- * Knowledge Library（原型 #page-knowledge）：文档表格 + 筛选 + 搜索 + 上传入口。
- * 行数据为固定演示数据（Phase 5 换 GET /documents）；"查看"打开 Source Viewer。
+ * Knowledge Library —— Phase 5 接真实 GET /documents。
+ * 行数据来自数据库（状态/版本/解析状态真实反映 ingestion 管线）。
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useUI } from "@/components/shell/ui-context";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/ui/icon";
-import { MOCK_DOCUMENTS, type MockDocumentRow } from "@/lib/mock-data";
+import { listDocuments, type ApiDocument } from "@/lib/api";
 
 type Filter = "all" | "active" | "superseded";
 
@@ -18,23 +18,37 @@ export default function KnowledgePage() {
   const { openSource, openUpload } = useUI();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [docs, setDocs] = useState<ApiDocument[] | null>(null); // null = 加载中
+  const [error, setError] = useState<string | null>(null);
+
+  const load = () => {
+    listDocuments()
+      .then((d) => {
+        setDocs(d);
+        setError(null);
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : String(e)));
+  };
+
+  useEffect(load, []);
 
   const rows = useMemo(() => {
+    if (!docs) return [];
     const q = query.trim().toLowerCase();
-    return MOCK_DOCUMENTS.filter(
+    return docs.filter(
       (r) =>
-        (!q || `${r.title} ${r.device} ${r.version}`.toLowerCase().includes(q)) &&
+        (!q || `${r.title} ${r.device_id} ${r.version ?? ""}`.toLowerCase().includes(q)) &&
         (filter === "all" || r.status.toLowerCase() === filter),
     );
-  }, [query, filter]);
+  }, [docs, query, filter]);
 
-  const openRow = (r: MockDocumentRow) => {
+  const openRow = (r: ApiDocument) => {
     openSource({
       title: r.title,
-      version: `v${r.version}`,
-      page: r.viewPage ?? 1,
-      trust: r.trust,
-      excerpt: "Demo excerpt — Phase 5 将展示该文档的真实检索段落（chunk 摘录）。",
+      version: r.version ? `v${r.version}` : "—",
+      page: 1,
+      trust: r.trust_level.startsWith("A") ? "Official" : "Internal",
+      excerpt: "Demo excerpt — Source Viewer 的真实 PDF 渲染在 T-020（PDF.js）接入。",
     });
   };
 
@@ -48,11 +62,10 @@ export default function KnowledgePage() {
           Knowledge Library
         </h1>
         <p className="mt-2.5 max-w-[720px] text-[14px] leading-relaxed text-ink-2">
-          管理设备资料、版本、可信等级与索引状态。默认检索只使用 Active / Current 版本，历史版本保留用于冲突识别与审计（ADR-0004）。
+          数据来自后端数据库：默认检索只使用 Active / Current 版本（ADR-0004）。
         </p>
       </div>
 
-      {/* 工具栏：搜索 + 状态筛选 + 上传 */}
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[260px] flex-1">
           <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
@@ -85,9 +98,16 @@ export default function KnowledgePage() {
           <Icon name="upload" className="h-[15px] w-[15px]" />
           Add document
         </button>
+        <button
+          className="inline-flex h-[33px] items-center rounded-full border border-line-soft bg-surface px-3 text-[11px] font-semibold text-ink-2 hover:border-line"
+          onClick={load}
+          aria-label="刷新列表"
+        >
+          <Icon name="down" className="h-[15px] w-[15px] rotate-180" />
+          Refresh
+        </button>
       </div>
 
-      {/* 文档表格 */}
       <div className="overflow-hidden rounded-r4 border border-line-soft bg-surface shadow-e1">
         <div className="overflow-auto">
           <table className="w-full min-w-[920px] border-collapse">
@@ -104,13 +124,45 @@ export default function KnowledgePage() {
               </tr>
             </thead>
             <tbody>
+              {error && (
+                <tr>
+                  <td colSpan={8} className="px-3.5 py-10 text-center text-[11px] text-red">
+                    后端不可达（{error}）：请确认 apps/api 已启动。
+                  </td>
+                </tr>
+              )}
+              {!error && docs === null && (
+                <tr>
+                  <td colSpan={8} className="px-3.5 py-10 text-center text-[11px] text-ink-3">
+                    加载中…
+                  </td>
+                </tr>
+              )}
+              {!error &&
+                docs?.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-3.5 py-10 text-center text-[11px] text-ink-3">
+                      知识库为空：点击右上 Add document 上传第一份 PDF。
+                    </td>
+                  </tr>
+                )}
+              {!error &&
+                docs !== null &&
+                docs.length > 0 &&
+                rows.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-3.5 py-10 text-center text-[11px] text-ink-3">
+                      没有匹配的文档。调整搜索词或筛选条件试试。
+                    </td>
+                  </tr>
+                )}
               {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-surface-2">
+                <tr key={r.document_id} className="hover:bg-surface-2">
                   <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">
                     <div className="flex items-center gap-2">
                       <span
                         className={`grid h-9 w-9 place-items-center rounded-[11px] ${
-                          r.status === "Active" ? "bg-blue-soft text-blue" : "bg-surface-3 text-ink-3"
+                          r.status === "ACTIVE" ? "bg-blue-soft text-blue" : "bg-surface-3 text-ink-3"
                         }`}
                       >
                         <Icon name="doc" />
@@ -118,21 +170,25 @@ export default function KnowledgePage() {
                       <span>
                         <strong className="block text-[11px]">{r.title}</strong>
                         <small className="mt-0.5 block text-[9px] text-ink-3">
-                          PDF · {r.pages} pages · {r.language}
+                          {r.parse_status ?? "—"} · {r.language.toUpperCase()}
                         </small>
                       </span>
                     </div>
                   </td>
-                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">{r.device}</td>
-                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">{r.type}</td>
-                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">{r.version}</td>
+                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">{r.device_id}</td>
+                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">
+                    {r.type.replace("_", " ").toLowerCase()}
+                  </td>
+                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px]">{r.version ?? "—"}</td>
                   <td className="border-b border-line-soft px-3.5 py-3">
-                    <Badge tone="blue">{r.trust}</Badge>
+                    <Badge tone="blue">{r.trust_level.startsWith("A") ? "Official" : "Internal"}</Badge>
                   </td>
                   <td className="border-b border-line-soft px-3.5 py-3">
-                    <Badge tone={r.status === "Active" ? "green" : "orange"}>{r.status}</Badge>
+                    <Badge tone={r.status === "ACTIVE" ? "green" : "orange"}>{r.status}</Badge>
                   </td>
-                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px] text-ink-3">{r.indexed}</td>
+                  <td className="border-b border-line-soft px-3.5 py-3 text-[11px] text-ink-3">
+                    {r.parse_status === "READY" ? "indexed" : (r.parse_status ?? "—")}
+                  </td>
                   <td className="border-b border-line-soft px-3.5 py-3">
                     <button
                       aria-label={`查看 ${r.title}`}
@@ -144,14 +200,6 @@ export default function KnowledgePage() {
                   </td>
                 </tr>
               ))}
-              {/* 空状态：筛选无结果时的明确反馈（不静默显示空表） */}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-3.5 py-10 text-center text-[11px] text-ink-3">
-                    没有匹配的文档。调整搜索词或筛选条件试试。
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
