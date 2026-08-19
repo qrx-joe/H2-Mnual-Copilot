@@ -1,0 +1,23 @@
+# 开发环境基础设施（系统设计 §1）。
+# MVP 仅 postgres 一个服务（技术规范 §100）：web/api 在宿主机运行。
+# 镜像固定 patch 版本，保证团队与新环境复现一致（ADR-0001）。
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.0-pg16
+    container_name: h2copilot-postgres
+    environment:
+      POSTGRES_USER: h2copilot
+      POSTGRES_PASSWORD: h2copilot
+      POSTGRES_DB: h2copilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - h2copilot_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U h2copilot -d h2copilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  h2copilot_pgdata:
