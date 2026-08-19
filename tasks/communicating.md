@@ -347,3 +347,50 @@
 
 - Q-010：百炼 API Key 注入方式（Phase 5 前需要）。
 - Q-011：HX-100 演示 PDF 与 golden 问题素材（Phase 5 评测前需要）。
+
+## 2026-08-19 · 交互 010
+
+> 时间：2026-08-19 22:26—22:50 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 执行 Phase 3（工程基线）。
+
+### AI 检查与行动
+
+- 建立完整工程并实际运行检查（详见 `docs/engineering-baseline.md`，提交 2091165/446d046/664bfd3/9afa13d）：
+  - `apps/api`：FastAPI 分层骨架 + `/health` + SSE 桩（契约事件序列）+ request_id/JSON 日志中间件 + 配置集中（§96 默认值）；ruff/mypy/pytest(8)/uvicorn 冒烟全绿；uv.lock 提交，Python 3.12 锁定。
+  - `apps/web`：create-next-app 16.3.1 精确锁定（无 `^`，C-7 关闭）；eslint/vitest(2)/next build 全绿；新增 evidence 四态徽章映射与单测（ADR-0005）。
+  - `packages/contracts`：契约 TS 类型包；`infra/compose`：pgvector 0.8.0-pg16；根 README/CI/evals 骨架/.gitignore（.env*、data/）。
+  - 数据库冒烟：容器 healthy；V-3 通过（vector 0.8.0；E104 词法精确命中且排除历史版本；向量余弦排序正确）。
+  - SSE 真实进程冒烟通过（V-6）。
+- 首轮失败并修复：ruff 6×E501、mypy 1×类型标注、Docker Desktop 未运行（启动后恢复）——全部如实记录于验证报告 §4。
+- 契约 v1.1：错误码新增 INTERNAL_ERROR。
+- 未实现业务功能（SSE 为标注清楚的桩）、未调用付费 API。
+
+### 本智能体写入内容
+
+| 文件 | 写入内容 |
+| --- | --- |
+| `apps/api/`（15 文件） | FastAPI 工程基线（含 uv.lock 与 8 个测试） |
+| `apps/web/`、`packages/contracts/`、`pnpm-workspace.yaml`、`pnpm-lock.yaml` | 前端工程与契约类型包 |
+| `infra/compose/docker-compose.yml`、`scripts/smoke_hybrid.sql` | 数据库与冒烟 SQL |
+| `README.md`、`.github/workflows/ci.yml`、`evals/datasets/README.md`、`.gitignore` | 根目录基线文件 |
+| `docs/engineering-baseline.md` | 实际命令与输出验证报告 |
+| `docs/architecture/contracts.md`、`system-design.md` | v1.1 错误码修订；V-3/V-6 证据层级升级 |
+| `tasks/todo.md` | T-007 移入已完成 |
+| `tasks/advice.md` | 新增交互 010：交付物、验证结论、契约变更、未覆盖风险 |
+| `tasks/next-todo.md` | 当前动作改为 Phase 4 |
+| `tasks/communicating.md` | 新增本条交互 010 |
+
+### 本轮决定
+
+- T-007 验收门通过：新环境可按 README 复现安装/启动/检查，实际输出已记录。
+- C-7 关闭（Next.js 16.3.1 精确锁定并提交 lockfile）。
+- SSE 桩保留至 Phase 5 由真实管线替换；证据层级 V-3/V-6 升级为本地验证。
+
+### 待确认
+
+- Q-010：百炼 API Key 注入方式（Phase 5 前需要）。
+- Q-011：HX-100 演示 PDF 与 golden 问题素材（Phase 5 评测前需要）。

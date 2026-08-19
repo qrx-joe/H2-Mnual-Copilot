@@ -127,6 +127,7 @@ EvidenceStatus:    SUFFICIENT | PARTIAL | INSUFFICIENT | CONFLICTING            
 ErrorCode(API):    DOCUMENT_PARSE_FAILED | KNOWLEDGE_NOT_READY | MODEL_UNAVAILABLE
                    | RETRIEVAL_FAILED | AMBIGUOUS_VERSION | INSUFFICIENT_EVIDENCE
                    | FORBIDDEN_DOCUMENT | RATE_LIMITED | VALIDATION_ERROR | UNAUTHORIZED_ADMIN 〔新增后两个〕
+                   | INTERNAL_ERROR 〔新增 v1.1（Phase 3）：未预期异常统一 500，不向客户端泄露内部细节〕
 TrustLevel:        A_OFFICIAL | B_INTERNAL | C_STANDARD | D_REFERENCE               （PRD §36）
 FeedbackType:      HELPFUL | INCORRECT | SAFETY_CONCERN                              （FR-009）
 AbstainReason:     NO_RELIABLE_SOURCE | CONFLICTING_VERSIONS                          （§45 + A6）

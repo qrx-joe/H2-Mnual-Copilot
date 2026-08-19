@@ -233,3 +233,33 @@
 2. 本机 Python 3.13，规范要求 3.12；uv 临时环境已验证 3.12 可用，工程基线以 `.python-version` 锁定。
 3. `import fitz` 已弃用，统一 `import pymupdf`。
 4. pymupdf4llm 依赖较重（onnxruntime/pymupdf-layout，12 包约 90MB），Docker 镜像体积需在 Phase 3 关注。
+
+## 2026-08-19 · 交互 010 Phase 3 工程基线（ZCode 出具）
+
+### 交付物（提交 2091165 / 446d046 / 664bfd3 / 9afa13d）
+
+- `apps/api`：FastAPI 分层骨架（config/logs/health/SSE 桩），uv.lock 提交，Python 3.12 锁定。
+- `apps/web`：Next.js 16.3.1 精确锁定（**C-7 关闭**），Tailwind v4，Vitest 首个单测（evidence 徽章映射）。
+- `packages/contracts`：契约 TS 类型包（workspace 链接）。
+- `infra/compose`：postgres+pgvector（0.8.0-pg16，healthcheck）。
+- 根：README（快速开始/检查命令）、CI workflow、evals 骨架、.gitignore（.env*、data/ 等）。
+- `docs/engineering-baseline.md`：全部实际命令与输出。
+
+### 验证结论（T-007 完成标准达成）
+
+| 项 | 结果 |
+| --- | --- |
+| API 检查链 | ruff 全绿；mypy 10 文件全绿；pytest 8/8；uvicorn 冒烟：/health OK、SSE 7 事件完整、JSON 访问日志（request_id/耗时） |
+| Web 检查链 | eslint 通过；vitest 2/2；next build 成功（含 TS 检查） |
+| 数据库 | 容器 10 秒 healthy；V-3 冒烟：vector 0.8.0、词法 E104 精确命中且排除历史版本、向量余弦排序正确（0.006 vs 0.782） |
+| 失败与修复 | ruff 6×E501（提取 conftest fixture）；mypy 1×返回类型（AsyncIterator）；Docker 初始未运行（启动 Docker Desktop 解决，如实记录） |
+
+证据层级变化：V-3、V-6 由【推断】升级为【本地验证】；V-1/V-2/V-5 维持；V-4 仍阻塞于 Q-010/Q-011。
+
+### 契约变更
+
+- contracts.md v1.1：错误码枚举新增 INTERNAL_ERROR（未预期异常 500，与 app.py 实现一致）。
+
+### 未覆盖风险（承接 engineering-baseline.md §5）
+
+- API 未连接真实数据库（T-013 起）；CI 未实际触发（无远端）；pnpm 的 esbuild 构建脚本未批准（vitest 可用，必要时 `pnpm approve-builds`）；Docker Desktop 需手动启动（README 已注明）。
