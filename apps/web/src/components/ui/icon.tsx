@@ -56,12 +56,18 @@ const FILLED = new Set(["spark", "more"]);
 
 export function Icon({
   name,
-  className = "h-[18px] w-[18px]",
+  className,
   ...rest
 }: { name: keyof typeof PATHS; className?: string } & SVGProps<SVGSVGElement>) {
   const filled = FILLED.has(name);
+  // SVG 没有宽高时会按替换元素默认尺寸 300×150 渲染——调用方只要传了
+  // 自定义 className 就不能丢默认尺寸；除非调用方自带 h-/w- 尺寸类。
+  const hasOwnSize = className ? /(?:^|\s)(?:h|w)-[^\s]+/.test(className) : false;
+  const cls = [hasOwnSize ? "" : "h-[18px] w-[18px]", className]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <svg viewBox="0 0 24 24" className={className} fill={filled ? "currentColor" : "none"} aria-hidden="true" {...rest}>
+    <svg viewBox="0 0 24 24" className={cls} fill={filled ? "currentColor" : "none"} aria-hidden="true" {...rest}>
       {PATHS[name].map((d) => (
         <path
           key={d}
