@@ -63,7 +63,7 @@ Knowledge 页上传弹窗（Admin 密码）
   → POST /documents/{id}/ingest（file，PDF≤50MB，MIME+扩展名校验）
     → hash 计算；重复 hash 直接复用已有 DocumentVersion（幂等，§16）
     → 状态机 UPLOADED→PARSING→PARSED→INDEXING→VALIDATING→READY（§19）
-      PARSE:  PyMuPDF4LLM；探测到扫描/复杂版式→MinerU（§20–21）
+      PARSE:  PyMuPDF4LLM（page_chunks=True 模式，页码取 metadata.page_number，1 起算——V-2 验证结论）；探测到扫描/复杂版式→MinerU（§20–21）
       CHUNK:  按 Chapter/Section/Paragraph 结构切分，350–700 token，overlap 50–100（§25–26）
       EMBED:  EmbeddingProvider（记录 embedding_model/version/dim，§32）
       STORE:  原始 PDF → ObjectStorage(LocalFS, ADR-0007)；chunk+向量 → Postgres
@@ -153,8 +153,8 @@ LANGFUSE_PUBLIC_KEY= LANGFUSE_SECRET_KEY=   # 可空：MVP 不启用
 | # | 假设（Phase 1 遗留） | 验证方式 | 结论与证据层级 |
 | --- | --- | --- | --- |
 | V-1 | RRF 融合、错误代码 regex 路由逻辑正确 | `scratch/phase2/verify_logic.py` 本地运行 | 【本地验证】通过：RRF 公式实现与多路排名融合行为符合预期；`^[A-Z]{1,4}[-_]?\d{2,6}$` 命中 E104/HX-100 类代码、拒绝普通语句 |
-| V-2 | PyMuPDF4LLM 可安装并产出结构化 Markdown | `scratch/phase2/verify_parser.py`（合成 PDF 往返） | 【本地验证】机制级通过：pip 安装、PDF→Markdown、标题/段落结构保留；真实手册质量【待验证：需演示 PDF】 |
+| V-2 | PyMuPDF4LLM 可安装并产出结构化 Markdown | `scratch/phase2/verify_parser.py`（合成 PDF 往返） | 【本地验证】机制级通过（9/9）；关键发现：页码溯源必须用 `page_chunks=True`，页码取 `metadata.page_number`；真实手册质量【待验证：需演示 PDF】 |
 | V-3 | pgvector hybrid SQL 正确性与性能 | 未运行（需起容器） | 【推断】SQL 模式来自 pgvector 官方文档口径（§9、§36）；Phase 3 集成测试落为【本地验证】，性能证据 Phase 5 |
 | V-4 | text-embedding-v4 + qwen3-rerank 检索质量 | 未运行（需 API 凭据） | 【待验证】阻塞于百炼 API Key（Q-010）与演示 PDF（Q-011） |
-| V-5 | Next.js 16.x 当前可用 patch 版本 | npm registry 查询 | 【本地验证】见 `scratch/phase2/RESULTS.md`；锁定动作在 Phase 3 |
+| V-5 | Next.js 16.x 当前可用 patch 版本 | npm registry 查询 | 【本地验证】latest=16.3.1（2026-08-19），Phase 3 锁定候选；锁定日复查 |
 | V-6 | SSE 流式可用性 | 未单独验证 | 【推断】FastAPI/Next.js 标准能力，风险低；Phase 3 工程基线以冒烟测试落证据 |
