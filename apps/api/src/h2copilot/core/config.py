@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     rerank_provider: str = ""
     rerank_model: str = ""
     admin_password: str = ""
+    # 百炼（DashScope）模型 API Key（Q-010）：只经 .env / 服务端环境注入，绝不入库、不进前端
+    dashscope_api_key: str = ""
 
     # 检索参数（技术规范 §96 默认值；rerank_candidates 对应 §40 的 Top30 截断）
     retrieval_dense_top_k: int = 20
