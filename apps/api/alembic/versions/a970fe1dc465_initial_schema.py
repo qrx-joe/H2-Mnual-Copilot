@@ -161,4 +161,8 @@ def downgrade() -> None:
     op.drop_table('devices')
     op.drop_index(op.f('ix_conversations_device_id'), table_name='conversations')
     op.drop_table('conversations')
+    # PostgreSQL ENUM 类型不会随表删除：不显式 DROP 会导致重新 upgrade 时
+    # CREATE TYPE 冲突（回滚演练实测发现，T-013 残余项修复）
+    for enum_name in ("processing_status", "publish_status", "document_type", "trust_level"):
+        sa.Enum(name=enum_name).drop(op.get_bind(), checkfirst=True)
     # ### end Alembic commands ###
