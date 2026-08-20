@@ -569,3 +569,39 @@
 ### 待确认
 
 - Q-010（百炼 API Key）/ Q-011（HX-100 演示 PDF 与 golden 素材）/ Q-012（Phase 4 视觉确认）维持，均等用户输入。
+
+## 2026-08-20 · 交互 015
+
+> 时间：2026-08-20 13:55—14:25 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 执行 Phase 7（验收与交付准备）。
+
+### AI 检查与行动
+
+- 全量检查链复跑：API ruff/mypy/pytest 26 全绿；web lint/vitest(5)/build 全绿；评测 recall/no-answer 双 1.0。（首轮 pytest 26 ERROR——Docker Desktop 中止导致，重启容器后恢复，如实记录。）
+- Alembic 回滚演练（测试库）：**发现 downgrade 未 DROP ENUM 类型导致重升级冲突**，修复迁移并复验通过（downgrade base → 仅剩 pgvector 类型 → upgrade head 重建 10 表）。
+- 变更范围检查：无 .env/data/缓存/临时文件入库；最大文件 uv.lock 112KB；发现工作区未提交的 DASHSCOPE_API_KEY 占位改动（空值无密钥，来源无法在本轮验证中确认为 ZCode 所写，按内容验证后入库并在提交信息注明）。
+- 产出：`docs/acceptance-report.md`（DoD 12 条：9 达成 / 2 部分阻塞 Q-010/Q-011 / 1 待部署授权）、`docs/release-checklist.md`（发布前检查、compose 发布步骤、5 级回滚、监控指标）、README 已知限制更新。
+- 候选版本标记：git tag `v0.1.0-rc1`（本地，未推送）。
+- 双服务重启并冒烟通过（E104 → PARTIAL + page 1）。**未部署、未推送、未写任何外部系统。**
+
+### 本智能体写入内容
+
+| 文件 | 写入内容 |
+| --- | --- |
+| `apps/api/alembic/versions/a970fe1dc465_initial_schema.py` | downgrade 补 ENUM DROP（回滚演练修复） |
+| `apps/api/.env.example`、`core/config.py` | DASHSCOPE_API_KEY 占位（工作区既有改动，验证入库） |
+| `docs/acceptance-report.md`、`docs/release-checklist.md`、`README.md` | 验收报告、发布回滚清单、已知限制 |
+| `tasks/{todo,next-todo,communicating}.md` | T-010 完成、Phase 8 待授权、交互 015 |
+
+### 本轮决定
+
+- T-010 验收门通过；候选版本定位为"本地可验收的 Fake 模型级 MVP"（真实模型证据阻塞于 Q-010/Q-011，已在验收报告如实分级）。
+- Phase 7 检查点移交用户：验收、决定部署/试运行/返工。
+
+### 待确认
+
+- 用户验收结论与路径选择（A 真实模型复验 / B Fake 级试运行 / C 修改意见）；Q-010/Q-011/Q-012 维持。
