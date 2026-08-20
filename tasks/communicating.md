@@ -629,3 +629,28 @@
 ### 待确认
 
 - 用户验收结论与路径选择（A 真实模型复验 / B Fake 级试运行 / C 修改意见）维持；Q-010/Q-011/Q-012 维持。
+
+## 2026-08-20 · 交互 018
+
+> 时间：2026-08-20 14:26—14:38 +08:00  
+> 智能体：ZCode 主智能体（模型 GLM-5.3，ZCode CLI）
+
+### 用户意图
+
+- 选择路径 A（补齐输入再复验）；询问：① API Key 先给还是用占位；② 真实手册 PDF 可否代搜、去哪找。
+
+### AI 检查与行动
+
+- 检索公开手册资源（3 轮 WebSearch：FuelCellStore/DOE h2tools/Enapter handbook）。
+- 下载验证两份公开厂商手册至 `data/manuals-candidates/`（gitignored，不入库避免再分发版权风险）：e208-rebuildable-pem-electrolyzer.pdf（16 页、25212 字符文本型，PyMuPDF 可解析）、u102-stack-experimentation-set.pdf（800KB 有效 PDF）。首下载被 Mod Security 406 拦截，加浏览器 UA 后成功。
+- 未修改代码；未调用付费 API。
+
+### 本轮决定
+
+- 手册候选存 data/（本地演示用）不入库；正式采用前由用户确认版权可用性（PRD §46：明确公开的厂商资料可用）。
+- API Key 交付方式建议：用户自行编辑 apps/api/.env 填入 DASHSCOPE_API_KEY（密钥不经过对话/日志/仓库），填好后口头告知即可。
+
+### 待确认
+
+- Q-010：用户在 apps/api/.env 填入真实 Key 并授权调用百炼测试。
+- Q-011：用户从候选手册中确认采用集（或提供自有手册）。
